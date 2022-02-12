@@ -12,13 +12,9 @@ class Mkvtoolnix < Formula
     regex(/href=.*?mkvtoolnix[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  head do
-    url "https://gitlab.com/mbunkus/mkvtoolnix.git", branch: "main"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "docbook-xsl" => :build
   depends_on "pkg-config" => :build
   depends_on "boost"
