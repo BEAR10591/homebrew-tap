@@ -60,7 +60,6 @@ class Mkvtoolnix < Formula
     extra_includes.chop!
     extra_libs.chop!
 
-    system "./autogen.sh" if build.head?
     system "./configure", "--disable-debug",
                           "--prefix=#{prefix}",
                           "--with-boost=#{Formula["boost"].opt_prefix}",
@@ -70,19 +69,5 @@ class Mkvtoolnix < Formula
                           "--enable-gui"
     system "rake", "-j#{ENV.make_jobs}"
     system "rake", "install"
-  end
-
-  test do
-    mkv_path = testpath/"Great.Movie.mkv"
-    sub_path = testpath/"subtitles.srt"
-    sub_path.write <<~EOS
-      1
-      00:00:10,500 --> 00:00:13,000
-      Homebrew
-    EOS
-
-    system "#{bin}/mkvmerge", "-o", mkv_path, sub_path
-    system "#{bin}/mkvinfo", mkv_path
-    system "#{bin}/mkvextract", "tracks", mkv_path, "0:#{sub_path}"
   end
 end
