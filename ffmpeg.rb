@@ -109,6 +109,7 @@ class Ffmpeg < Formula
       --enable-libzimg
       --disable-libjack
       --disable-indev=jack
+      --enable-nonfree
       --enable-libfdk-aac
       --enable-libaribb24
     ]
