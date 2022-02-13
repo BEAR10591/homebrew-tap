@@ -39,7 +39,6 @@ class Ffmpeg < Formula
   depends_on "nasm" => :build
   depends_on "pkg-config" => :build
   depends_on "texinfo" => :build
-  depends_on "chromaprint" => :build
 
   depends_on "aom"
   depends_on "dav1d"
@@ -58,6 +57,8 @@ class Ffmpeg < Formula
   depends_on "x265"
   depends_on "xz"
 
+  depends_on "chromaprint" => :optional
+  depends_on "decklink" => :optional
   depends_on "fdk-aac" => :optional
   depends_on "game-music-emu" => :optional
   depends_on "jack" => :optional
