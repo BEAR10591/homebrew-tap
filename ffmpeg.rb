@@ -34,7 +34,7 @@ class Ffmpeg < Formula
   option "with-srt", "Enable SRT library"
   option "with-libvmaf", "Enable libvmaf scoring library"
   option "with-libxml2", "Enable libxml2 library"
-  option "with-landonepps/libaribb24/libaribb24", "Enable libaribb24 library"
+  option "with-libaribb24", "Enable libaribb24 library"
 
   depends_on "nasm" => :build
   depends_on "pkg-config" => :build
