@@ -34,7 +34,6 @@ class Ffmpeg < Formula
   option "with-srt", "Enable SRT library"
   option "with-libvmaf", "Enable libvmaf scoring library"
   option "with-libxml2", "Enable libxml2 library"
-  option "with-libaribb24", "Enable libaribb24 library"
 
   depends_on "nasm" => :build
   depends_on "pkg-config" => :build
@@ -56,6 +55,7 @@ class Ffmpeg < Formula
   depends_on "x264"
   depends_on "x265"
   depends_on "xz"
+  depends_on "landonepps/libaribb24/libaribb24"
 
   depends_on "chromaprint" => :optional
   depends_on "amiaopensource/amiaos/decklinksdk" => :optional
@@ -90,7 +90,6 @@ class Ffmpeg < Formula
   depends_on "xvid" => :optional
   depends_on "zeromq" => :optional
   depends_on "zimg" => :optional
-  depends_on "landonepps/libaribb24/libaribb24" => :optional
 
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
@@ -123,6 +122,7 @@ class Ffmpeg < Formula
       --enable-frei0r
       --enable-libass
       --enable-demuxer=dash
+      --enable-libaribb24
     ]
 
     if OS.mac?
@@ -162,7 +162,6 @@ class Ffmpeg < Formula
     args << "--enable-libzimg" if build.with? "zimg"
     args << "--enable-libzmq" if build.with? "zeromq"
     args << "--enable-openssl" if build.with? "openssl"
-    args << "--enable-libaribb24" if build.with? "landonepps/libaribb24/libaribb24"
 
     # These librares are GPL-incompatible, and require ffmpeg be built with
     # the "--enable-nonfree" flag, which produces unredistributable libraries
