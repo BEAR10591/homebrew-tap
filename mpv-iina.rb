@@ -17,11 +17,10 @@ class MpvIina < Formula
   depends_on "little-cms2"
   depends_on "luajit-openresty"
   depends_on "libbluray"
+
   depends_on "mujs"
   depends_on "uchardet"
-  depends_on "yt-dlp"
-  uses_from_macos "libiconv"
-  uses_from_macos "zlib"
+  # depends_on "vapoursynth"
 
   def install
     # LANG is unset by default on macOS and causes issues when calling getlocale
@@ -33,9 +32,6 @@ class MpvIina < Formula
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["libarchive"].opt_lib/"pkgconfig"
     # luajit-openresty is key-only
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["luajit-openresty"].opt_lib/"pkgconfig"
-
-    ENV["CFLAGS"] = "-O3 -flto"
-    ENV["LDFLAGS"] = "-flto"
 
     args = %W[
       --prefix=#{prefix}
