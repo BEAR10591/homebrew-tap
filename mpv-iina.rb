@@ -7,8 +7,6 @@ class MpvIina < Formula
 
   patch :DATA
 
-  keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use"
-
   depends_on "docutils" => :build
   depends_on "pkg-config" => :build
   depends_on "python@3.9" => :build
