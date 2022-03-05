@@ -5,6 +5,10 @@ class MpvIina < Formula
   sha256 "32ded8c13b6398310fa27767378193dc1db6d78b006b70dbcbd3123a1445e746"
   head "https://github.com/mpv-player/mpv.git"
 
+  patch :DATA
+
+  keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use"
+
   depends_on "docutils" => :build
   depends_on "pkg-config" => :build
   depends_on "python@3.9" => :build
@@ -17,10 +21,11 @@ class MpvIina < Formula
   depends_on "little-cms2"
   depends_on "luajit-openresty"
   depends_on "libbluray"
-
   depends_on "mujs"
   depends_on "uchardet"
-  # depends_on "vapoursynth"
+  depends_on "yt-dlp"
+  uses_from_macos "libiconv"
+  uses_from_macos "zlib"
 
   def install
     # LANG is unset by default on macOS and causes issues when calling getlocale
@@ -32,6 +37,9 @@ class MpvIina < Formula
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["libarchive"].opt_lib/"pkgconfig"
     # luajit-openresty is key-only
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["luajit-openresty"].opt_lib/"pkgconfig"
+
+    ENV["CFLAGS"] = "-O3 -flto"
+    ENV["LDFLAGS"] = "-flto"
 
     args = %W[
       --prefix=#{prefix}
