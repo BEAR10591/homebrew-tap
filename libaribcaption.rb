@@ -6,8 +6,8 @@ class Libaribcaption < Formula
     depends_on "cmake" => :build
 
     def install
-        system "cmake", ".", "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX=#{prefix}"
-        system "cmake", "--build", ".", "-j8"
-        system "cmake", "--install", "."
+        system "cmake", "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX=#{prefix}"
+        system "cmake", "--build", "-j8"
+        system "cmake", "--install"
     end
   end
