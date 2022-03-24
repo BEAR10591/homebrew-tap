@@ -10,7 +10,7 @@ class X265 < Formula
   depends_on "nasm" => :build if Hardware::CPU.intel?
 
   def install
-    system "patch", "-u", "'./source/CMakeLists.txt'", "<", "'~/Documents/apple_arm64_x265.patch'"
+    system "patch", "-u", "./source/CMakeLists.txt", "<", "/Library/apple_arm64_x265.patch"
 
     # Build based off the script at ./build/linux/multilib.sh
     args = std_cmake_args + %W[
