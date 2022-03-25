@@ -10,7 +10,7 @@ class X265 < Formula
   depends_on "nasm" => :build if Hardware::CPU.intel?
 
   def patches
-    "https://github.com/Vargol/ffmpeg-apple-arm64-build/blob/84e9aaabbad6834f8cbdfe696a318bc13ec2e9ba/build/apple_arm64_x265.patch"
+    "https://raw.githubusercontent.com/Vargol/ffmpeg-apple-arm64-build/84e9aaabbad6834f8cbdfe696a318bc13ec2e9ba/build/apple_arm64_x265.patch"
   end
 
   def install
