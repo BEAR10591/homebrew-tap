@@ -35,7 +35,7 @@ class Mpv < Formula
   depends_on "sdl2" => :optional
 
   on_macos do
-    depends_on "bear10591/tap/dockutil" => :recommended
+    depends_on "bear10591/tap/dockutil@3" => :recommended
     depends_on "coreutils" => :recommended
     depends_on "tag" => :recommended
     depends_on "trash" => :recommended
