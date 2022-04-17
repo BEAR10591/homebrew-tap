@@ -10,7 +10,6 @@ class Mpv < Formula
   depends_on "docutils" => :build
   depends_on "pkg-config" => :build
   depends_on "python@3.9" => :build
-  depends_on xcode: :build
 
   depends_on "bear10591/tap/ffmpeg"
   depends_on "jpeg"
