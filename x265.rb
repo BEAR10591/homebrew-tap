@@ -6,7 +6,9 @@ class X265 < Formula
   license "GPL-2.0-only"
   head "https://bitbucket.org/multicoreware/x265_git.git", branch: "stable"
 
-  patch "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/apple_arm64_x265.patch"
+  patch do
+    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/apple_arm64_x265.patch"
+  end
 
   depends_on "cmake" => :build
 
