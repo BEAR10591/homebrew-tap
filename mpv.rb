@@ -64,8 +64,6 @@ class Mpv < Formula
     system python3, "bootstrap.py"
     system python3, "waf", "configure", *args
     system python3, "waf", "install"
-    system python3, "TOOLS/osxbundle.py", "build/mpv"
-    prefix.install "build/mpv.app"
   end
 
   test do
