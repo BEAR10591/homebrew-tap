@@ -50,7 +50,6 @@ class Ffmpeg < Formula
   depends_on "xz"
   depends_on "zeromq"
   depends_on "zimg"
-  depends_on "fdk-aac"
   depends_on "jpeg-xl"
   depends_on "webp"
 
@@ -116,8 +115,6 @@ class Ffmpeg < Formula
       --enable-libsoxr
       --enable-libzmq
       --enable-libzimg
-      --enable-nonfree
-      --enable-libfdk-aac
       --enable-libjxl
       --enable-libwebp
       --disable-libjack
