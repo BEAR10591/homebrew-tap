@@ -1,7 +1,6 @@
-diff --git a/libavformat/matroska.c b/libavformat/matroska.c
-index 90d94b65bf..79b2d09984 100644
---- a/libavformat/matroska.c
-+++ b/libavformat/matroska.c
+diff -Naur ./libavformat/matroska.c ../matroska_aribsub_patch/libavformat/matroska.c
+--- ./libavformat/matroska.c
++++ ../matroska_aribsub_patch/libavformat/matroska.c
 @@ -76,6 +76,7 @@ const CodecTags ff_mkv_codec_tags[]={
      {"S_DVBSUB"         , AV_CODEC_ID_DVB_SUBTITLE},
      {"S_HDMV/PGS"       , AV_CODEC_ID_HDMV_PGS_SUBTITLE},
@@ -10,10 +9,9 @@ index 90d94b65bf..79b2d09984 100644
 
      {"V_AV1"            , AV_CODEC_ID_AV1},
      {"V_AVS2"           , AV_CODEC_ID_AVS2},
-diff --git a/libavformat/matroskadec.c b/libavformat/matroskadec.c
-index d582f566a2..3a888e3ada 100644
---- a/libavformat/matroskadec.c
-+++ b/libavformat/matroskadec.c
+diff -Naur ./libavformat/matroskadec.c ../matroska_aribsub_patch/libavformat/matroskadec.c
+--- ./libavformat/matroskadec.c
++++ ../matroska_aribsub_patch/libavformat/matroskadec.c
 @@ -50,6 +50,7 @@
  #include "libavutil/time_internal.h"
  #include "libavutil/spherical.h"
@@ -58,10 +56,9 @@ index d582f566a2..3a888e3ada 100644
          }
          track->codec_priv.size -= extradata_offset;
 
-diff --git a/libavformat/matroskaenc.c b/libavformat/matroskaenc.c
-index 2deb4284e8..67cfec761a 100644
---- a/libavformat/matroskaenc.c
-+++ b/libavformat/matroskaenc.c
+diff -Naur ./libavformat/matroskaenc.c ../matroska_aribsub_patch/libavformat/matroskaenc.c
+--- ./libavformat/matroskaenc.c
++++ ../matroska_aribsub_patch/libavformat/matroskaenc.c
 @@ -58,6 +58,7 @@
  #include "libavutil/stereo3d.h"
 
