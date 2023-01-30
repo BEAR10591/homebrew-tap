@@ -14,8 +14,16 @@ class Ffmpeg < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  patch do
-    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/FFmpeg-devel-lavf-matroska-add-support-for-ARIB-captions.patch"
+  stable do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_matroska_aribsub-5.1.2.patch"
+    end
+  end
+
+  head do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_matroska_aribsub-master.patch"
+    end
   end
 
   depends_on "pkg-config" => :build
