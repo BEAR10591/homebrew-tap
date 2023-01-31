@@ -1,28 +1,37 @@
-class MpvIina < Formula
+class Mpv < Formula
   desc "Media player based on MPlayer and mplayer2"
   homepage "https://mpv.io"
-  url "https://github.com/mpv-player/mpv/archive/v0.35.0.tar.gz"
-  sha256 "dc411c899a64548250c142bf1fa1aa7528f1b4398a24c86b816093999049ec00"
+  url "https://github.com/mpv-player/mpv/archive/v0.35.1.tar.gz"
+  sha256 "41df981b7b84e33a2ef4478aaf81d6f4f5c8b9cd2c0d337ac142fc20b387d1a9"
   license :cannot_represent
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
   keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use"
 
+  stable do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_matroska_aribsub-0.35.1.patch"
+    end
+  end
+
   depends_on "docutils" => :build
   depends_on "pkg-config" => :build
   depends_on "python@3.11" => :build
   depends_on xcode: :build
-  depends_on "bear10591/tap/ffmpeg-iina"
+  depends_on "bear10591/tap/ffmpeg"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
   depends_on "little-cms2"
   depends_on "luajit"
-  depends_on "libbluray"
   depends_on "mujs"
   depends_on "uchardet"
-  # depends_on "vapoursynth"
-  depends_on "yt-dlp/taps/yt-dlp"
+  depends_on "vapoursynth"
+  depends_on "yt-dlp"
+
+  on_linux do
+    depends_on "alsa-lib"
+  end
 
   fails_with gcc: "5" # ffmpeg is compiled with GCC
 
@@ -42,7 +51,6 @@ class MpvIina < Formula
       --enable-lua
       --enable-libarchive
       --enable-uchardet
-      --enable-libbluray
       --disable-swift
       --disable-debug-build
       --disable-macos-media-player
@@ -61,5 +69,6 @@ class MpvIina < Formula
 
   test do
     system bin/"mpv", "--ao=null", "--vo=null", test_fixtures("test.wav")
+    assert_match "vapoursynth", shell_output(bin/"mpv --vf=help")
   end
 end
