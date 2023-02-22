@@ -8,17 +8,11 @@ class MpvIina < Formula
 
   keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use"
 
-  stable do
-    patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_matroska_aribsub-0.35.1.patch"
-    end
-  end
-
   depends_on "docutils" => :build
   depends_on "pkg-config" => :build
   depends_on "python@3.11" => :build
   depends_on xcode: :build
-  depends_on "bear10591/tap/ffmpeg"
+  depends_on "bear10591/tap/ffmpeg-iina"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
