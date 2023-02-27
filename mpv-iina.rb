@@ -18,14 +18,10 @@ class MpvIina < Formula
   depends_on "libass"
   depends_on "little-cms2"
   depends_on "luajit"
+  depends_on "libbluray"
   depends_on "mujs"
   depends_on "uchardet"
-  depends_on "vapoursynth"
   depends_on "yt-dlp"
-
-  on_linux do
-    depends_on "alsa-lib"
-  end
 
   fails_with gcc: "5" # ffmpeg is compiled with GCC
 
@@ -45,6 +41,7 @@ class MpvIina < Formula
       --enable-lua
       --enable-libarchive
       --enable-uchardet
+      --enable-libbluray
       --disable-swift
       --disable-debug-build
       --disable-macos-media-player
@@ -63,6 +60,5 @@ class MpvIina < Formula
 
   test do
     system bin/"mpv", "--ao=null", "--vo=null", test_fixtures("test.wav")
-    assert_match "vapoursynth", shell_output(bin/"mpv --vf=help")
   end
 end
