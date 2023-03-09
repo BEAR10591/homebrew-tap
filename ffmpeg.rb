@@ -1,12 +1,11 @@
 class Ffmpeg < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-5.1.2.tar.xz"
-  sha256 "619e706d662c8420859832ddc259cd4d4096a48a2ce1eefd052db9e440eef3dc"
+  url "https://ffmpeg.org/releases/ffmpeg-6.0.tar.xz"
+  sha256 "57be87c22d9b49c112b6d24bc67d42508660e6b718b3db89c44e47e289137082"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
-  revision 3
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
@@ -45,7 +44,7 @@ class Ffmpeg < Formula
   depends_on "theora"
   depends_on "webp"
   depends_on "x264"
-  depends_on "x265"
+  depends_on "bear10591/tap/x265"
   depends_on "xvid"
   depends_on "xz"
   depends_on "zeromq"
