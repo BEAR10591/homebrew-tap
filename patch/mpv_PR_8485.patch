@@ -411,3 +411,56 @@ index 86231b79b1b..ff0f5d1f7d9 100644
          'name': '--macos-media-player',
          'desc': 'macOS Media Player support',
          'deps': 'macos-10-12-2-features && swift',
+diff --git a/meson.build b/meson.build
+--- a/meson.build
++++ b/meson.build
+@@ -1485,6 +1485,16 @@
+     error_message: 'a suitable macos sdk version could not be found!',
+ )
+
++macos_10_11_features = get_option('macos-10-11-2-features').require(
++    macos_sdk_version.version_compare('>=10.11.2'),
++    error_message: 'a suitable macos sdk version could not be found!',
++)
++
++macos_10_11_features = get_option('macos-10-12-features').require(
++    macos_sdk_version.version_compare('>=10.12'),
++    error_message: 'a suitable macos sdk version could not be found!',
++)
++
+ macos_10_12_2_features = get_option('macos-10-12-2-features').require(
+     macos_sdk_version.version_compare('>=10.12.2'),
+     error_message: 'a suitable macos sdk version could not be found!',
+@@ -1492,6 +1502,16 @@
+
+ macos_10_14_features = get_option('macos-10-14-features').require(
+     macos_sdk_version.version_compare('>=10.14'),
++    error_message: 'a suitable macos sdk version could not be found!',
++)
++
++macos_10_14_features = get_option('macos-10-14-6-features').require(
++    macos_sdk_version.version_compare('>=10.14.6'),
++    error_message: 'a suitable macos sdk version could not be found!',
++)
++
++macos_10_14_features = get_option('macos-10-15-4-features').require(
++    macos_sdk_version.version_compare('>=10.15.4'),
+     error_message: 'a suitable macos sdk version could not be found!',
+ )
+
+diff --git a/meson_options.txt b/meson_options.txt
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -106,8 +106,12 @@
+
+ # macOS features
+ option('macos-10-11-features', type: 'feature', value: 'auto', description: 'macOS 10.11 SDK Features')
++option('macos-10-11-2-features', type: 'feature', value: 'auto', description: 'macOS 10.11 SDK Features')
++option('macos-10-12-features', type: 'feature', value: 'auto', description: 'macOS 10.11 SDK Features')
+ option('macos-10-12-2-features', type: 'feature', value: 'auto', description: 'macOS 10.12.2 SDK Features')
+ option('macos-10-14-features', type: 'feature', value: 'auto', description: 'macOS 10.14 SDK Features')
++option('macos-10-14-6-features', type: 'feature', value: 'auto', description: 'macOS 10.14 SDK Features')
++option('macos-10-15-4-features', type: 'feature', value: 'auto', description: 'macOS 10.14 SDK Features')
+ option('macos-cocoa-cb', type: 'feature', value: 'auto', description: 'macOS libmpv backend')
+ option('macos-media-player', type: 'feature', value: 'auto', description: 'macOS Media Player support')
+ option('macos-touchbar', type: 'feature', value: 'auto', description: 'macOS Touch Bar support')
