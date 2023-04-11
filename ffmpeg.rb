@@ -15,13 +15,13 @@ class Ffmpeg < Formula
 
   depends_on "pkg-config" => :build
   depends_on "aom"
-  depends_on "aribb24"
   depends_on "dav1d"
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "frei0r"
   depends_on "gnutls"
   depends_on "lame"
+  depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
   depends_on "librist"
@@ -80,7 +80,7 @@ class Ffmpeg < Formula
       --enable-gnutls
       --enable-gpl
       --enable-libaom
-      --enable-libaribb24
+      --enable-libaribcaption
       --enable-libbluray
       --enable-libdav1d
       --enable-libmp3lame
