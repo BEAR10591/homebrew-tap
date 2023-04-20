@@ -13,15 +13,21 @@ class FfmpegIina < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  head do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption_option.patch"
+    end
+  end
+
   keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use and has no binaraies (ffmpeg, ffplay etc.)"
 
   depends_on "pkg-config" => :build
-  depends_on "aribb24"
   depends_on "dav1d"
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "frei0r"
   depends_on "gnutls"
+  depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
   depends_on "libsoxr"
@@ -57,7 +63,7 @@ class FfmpegIina < Formula
       --enable-ffplay
       --enable-gnutls
       --enable-gpl
-      --enable-libaribb24
+      --enable-libaribcaption
       --enable-libbluray
       --enable-libdav1d
       --enable-librubberband
