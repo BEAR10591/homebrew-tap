@@ -1,0 +1,34 @@
+diff --git a/libavcodec/libaribcaption.c b/libavcodec/libaribcaption.c
+index 747ca8a..c80d3c7 100644
+--- a/libavcodec/libaribcaption.c
++++ b/libavcodec/libaribcaption.c
+@@ -1108,7 +1108,7 @@ static int aribcaption_init(AVCodecContext *avctx)
+ static const AVOption options[] = {
+     { "sub_type", "subtitle rendering type",
+       OFFSET(subtitle_type), AV_OPT_TYPE_INT,
+-      { .i64 = SUBTITLE_ASS }, SUBTITLE_NONE, SUBTITLE_ASS, SD, "type" },
++      { .i64 = SUBTITLE_BITMAP }, SUBTITLE_NONE, SUBTITLE_ASS, SD, "type" },
+     { "none",   "do nothing", 0, AV_OPT_TYPE_CONST,
+       { .i64 = SUBTITLE_NONE }, .flags = SD, .unit = "type" },
+     { "bitmap", "bitmap rendering", 0, AV_OPT_TYPE_CONST,
+@@ -1131,9 +1131,9 @@ static const AVOption options[] = {
+     { "ass_single_rect", "workaround of ASS subtitle for players which can't handle multi-rectangle [ass]",
+       OFFSET(ass_single_rect), AV_OPT_TYPE_BOOL, { .i64 = ASS_SINGLE_RECT }, 0, 1, SD },
+     { "font", "comma-separated font family [ass, bitmap]",
+-      OFFSET(font), AV_OPT_TYPE_STRING, { .str = NULL }, 0, 0, SD },
++      OFFSET(font), AV_OPT_TYPE_STRING, { .str = "Hiragino Maru Gothic ProN","Rounded M+ 1m for ARIB" }, 0, 0, SD },
+     { "replace_fullwidth_ascii", "replace MSZ fullwidth alphanumerics with halfwidth alphanumerics [ass, bitmap]",
+-      OFFSET(replace_fullwidth_ascii), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, SD },
++      OFFSET(replace_fullwidth_ascii), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, SD },
+     { "force_outline_text", "always render characters with outline [(ass), bitmap]",
+       OFFSET(force_stroke_text), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, SD },
+     { "ignore_background", "ignore rendering caption background [(ass), bitmap]",
+@@ -1141,7 +1141,7 @@ static const AVOption options[] = {
+     { "ignore_ruby", "ignore ruby-like characters [ass, bitmap]",
+       OFFSET(ignore_ruby), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, SD },
+     { "outline_width", "outline width of text [(ass), bitmap]",
+-      OFFSET(stroke_width), AV_OPT_TYPE_FLOAT, { .dbl = 1.5 }, 0.0, 3.0, SD },
++      OFFSET(stroke_width), AV_OPT_TYPE_FLOAT, { .dbl = 0.0 }, 0.0, 3.0, SD },
+     { "replace_drcs", "replace known DRCS [bitmap]",
+       OFFSET(replace_drcs), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, SD },
+     {"canvas_size", "set input video size (WxH or abbreviation) [bitmap]",
