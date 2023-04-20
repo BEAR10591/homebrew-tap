@@ -8,7 +8,7 @@ class Mpv < Formula
 
   head do
     patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_PR_8485.patch"
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_aribcaption_bitmap.patch"
     end
   end
 
