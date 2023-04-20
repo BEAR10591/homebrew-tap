@@ -6,7 +6,7 @@ class MpvIina < Formula
   license :cannot_represent
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  head do
+  stable do
     patch do
       url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv-iina.patch"
     end
