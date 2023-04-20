@@ -1,0 +1,218 @@
+diff --git a/demux/demux_mkv.c b/demux/demux_mkv.c
+index 3f0472dae96..c330709d23b 100644
+--- a/demux/demux_mkv.c
++++ b/demux/demux_mkv.c
+@@ -1831,9 +1831,15 @@ static const char *const mkv_sub_tag[][2] = {
+     { "D_WEBVTT/CAPTIONS",  "webvtt-webm"},
+     { "S_TEXT/WEBVTT",      "webvtt"},
+     { "S_DVBSUB",           "dvb_subtitle"},
++    { "S_ARIBSUB",          "arib_caption"},
+     {0}
+ };
+
++static void avcodec_par_destructor(void *p)
++{
++    avcodec_parameters_free(p);
++}
++
+ static int demux_mkv_open_sub(demuxer_t *demuxer, mkv_track_t *track)
+ {
+     const char *subtitle_type = NULL;
+@@ -1862,6 +1868,38 @@ static int demux_mkv_open_sub(demuxer_t *demuxer, mkv_track_t *track)
+     sh->codec->extradata = track->private_data;
+     sh->codec->extradata_size = track->private_size;
+
++    if (!strcmp(sh->codec->codec, "arib_caption") && track->private_size >= 3) {
++        struct AVCodecParameters **lavp = talloc_ptrtype(track, lavp);
++
++        talloc_set_destructor(lavp, avcodec_par_destructor);
++
++        struct AVCodecParameters *lav = *lavp = sh->codec->lav_codecpar = avcodec_parameters_alloc();
++        MP_HANDLE_OOM(lav);
++
++        lav->codec_type = AVMEDIA_TYPE_SUBTITLE;
++        lav->codec_id = AV_CODEC_ID_ARIB_CAPTION;
++
++        int component_tag = track->private_data[0];
++        int data_component_id = AV_RB16(track->private_data + 1);
++        switch (data_component_id) {
++        case 0x0008:
++            // [0x30..0x37] are component tags utilized for
++            // non-mobile captioning service ("profile A").
++            if (component_tag >= 0x30 && component_tag <= 0x37)
++                lav->profile = FF_PROFILE_ARIB_PROFILE_A;
++            break;
++        case 0x0012:
++            // component tag 0x87 signifies a mobile/partial reception
++            // (1seg) captioning service ("profile C").
++            if (component_tag == 0x87)
++                lav->profile = FF_PROFILE_ARIB_PROFILE_C;
++            break;
++        }
++        if (lav->profile == FF_PROFILE_UNKNOWN)
++            MP_WARN(demuxer, "ARIB caption profile %02x / %04x not supported.\n",
++                    component_tag, data_component_id);
++    }
++
+     demux_add_sh_stream(demuxer, sh);
+
+     if (!subtitle_type)
+diff --git a/sub/sd_lavc.c b/sub/sd_lavc.c
+index 1f7bf76..f7405e7 100644
+--- a/sub/sd_lavc.c
++++ b/sub/sd_lavc.c
+@@ -83,6 +83,7 @@ static int init(struct sd *sd)
+     case AV_CODEC_ID_HDMV_PGS_SUBTITLE:
+     case AV_CODEC_ID_XSUB:
+     case AV_CODEC_ID_DVD_SUBTITLE:
++    case AV_CODEC_ID_ARIB_CAPTION:
+         break;
+     default:
+         return -1;
+diff --git a/player/lua/ytdl_hook.lua b/player/lua/ytdl_hook.lua
+index f40579ad36..77f7446ed2 100644
+--- a/player/lua/ytdl_hook.lua
++++ b/player/lua/ytdl_hook.lua
+@@ -47,6 +47,7 @@ local tag_list = {
+     -- (default --display-tags does not include this name)
+     ["description"]     = "ytdl_description",
+     -- "title" is handled by force-media-title
++    -- tags don't work with all_formats=yes
+ }
+
+ local safe_protos = Set {
+@@ -90,17 +91,18 @@ local function map_codec_to_mpv(codec)
+ end
+
+ local function platform_is_windows()
+-    return package.config:sub(1,1) == "\\"
++    return mp.get_property_native("platform") == "windows"
+ end
+
+ local function exec(args)
+     msg.debug("Running: " .. table.concat(args, " "))
+
+-    local ret = mp.command_native({name = "subprocess",
+-                                   args = args,
+-                                   capture_stdout = true,
+-                                   capture_stderr = true})
+-    return ret.status, ret.stdout, ret, ret.killed_by_us
++    return mp.command_native({
++        name = "subprocess",
++        args = args,
++        capture_stdout = true,
++        capture_stderr = true,
++    })
+ end
+
+ -- return true if it was explicitly set on the command line
+@@ -295,7 +297,7 @@ local function edl_track_joined(fragments, protocol, is_live, base)
+         local args = ""
+
+         -- assume MP4 DASH initialization segment
+-        if not fragments[1].duration then
++        if not fragments[1].duration and #fragments > 1 then
+             msg.debug("Using init segment")
+             args = args .. ",init=" .. edl_escape(join_url(base, fragments[1]))
+             offset = 2
+@@ -307,7 +309,7 @@ local function edl_track_joined(fragments, protocol, is_live, base)
+         -- if not available in all, give up.
+         for i = offset, #fragments do
+             if not fragments[i].duration then
+-                msg.error("EDL doesn't support fragments" ..
++                msg.verbose("EDL doesn't support fragments " ..
+                          "without duration with MP4 DASH")
+                 return nil
+             end
+@@ -421,6 +423,7 @@ local function formats_to_edl(json, formats, use_all_formats)
+             track.protocol, json.is_live,
+             track.fragment_base_url)
+         if not edl_track and not url_is_safe(track.url) then
++            msg.error("No safe URL or supported fragmented stream available")
+             return nil
+         end
+
+@@ -628,7 +631,9 @@ local function add_single_video(json)
+
+     mp.set_property("stream-open-filename", streamurl:gsub("^data:", "data://", 1))
+
+-    mp.set_property("file-local-options/force-media-title", json.title)
++    if mp.get_property("force-media-title", "") == "" then
++        mp.set_property("file-local-options/force-media-title", json.title)
++    end
+
+     -- set hls-bitrate for dash track selection
+     if max_bitrate > 0 and
+@@ -805,9 +810,9 @@ function run_ytdl_hook(url)
+     table.insert(command, "--")
+     table.insert(command, url)
+
+-    local es, json, result, aborted
++    local result
+     if ytdl.searched then
+-        es, json, result, aborted = exec(command)
++        result = exec(command)
+     else
+         local separator = platform_is_windows() and ";" or ":"
+         if o.ytdl_path:match("[^" .. separator .. "]") then
+@@ -825,12 +830,12 @@ function run_ytdl_hook(url)
+                 msg.verbose("Found youtube-dl at: " .. ytdl_cmd)
+                 ytdl.path = ytdl_cmd
+                 command[1] = ytdl.path
+-                es, json, result, aborted = exec(command)
++                result = exec(command)
+                 break
+             else
+                 msg.verbose("No youtube-dl found with path " .. path .. exesuf .. " in config directories")
+                 command[1] = path
+-                es, json, result, aborted = exec(command)
++                result = exec(command)
+                 if result.error_string == "init" then
+                     msg.verbose("youtube-dl with path " .. path .. exesuf .. " not found in PATH or not enough permissions")
+                 else
+@@ -844,20 +849,21 @@ function run_ytdl_hook(url)
+         ytdl.searched = true
+     end
+
+-    if aborted then
++    if result.killed_by_us then
+         return
+     end
+
++    local json = result.stdout
+     local parse_err = nil
+
+-    if (es ~= 0) or (json == "") then
++    if result.status ~= 0 or json == "" then
+         json = nil
+     elseif json then
+         json, parse_err = utils.parse_json(json)
+     end
+
+     if (json == nil) then
+-        msg.verbose("status:", es)
++        msg.verbose("status:", result.status)
+         msg.verbose("reason:", result.error_string)
+         msg.verbose("stdout:", result.stdout)
+         msg.verbose("stderr:", result.stderr)
+@@ -870,10 +876,8 @@ function run_ytdl_hook(url)
+             err = err .. "not found or not enough permissions"
+         elseif parse_err then
+             err = err .. "failed to parse JSON data: " .. parse_err
+-        elseif not result.killed_by_us then
+-            err = err .. "unexpected error occurred"
+         else
+-            err = string.format("%s returned '%d'", err, es)
++            err = err .. "unexpected error occurred"
+         end
+         msg.error(err)
+         if parse_err or string.find(ytdl_err, "yt%-dl%.org/bug") then
+@@ -925,7 +929,7 @@ function run_ytdl_hook(url)
+             set_http_headers(json.entries[1].http_headers)
+
+             mp.set_property("stream-open-filename", playlist)
+-            if not (json.title == nil) then
++            if json.title and mp.get_property("force-media-title", "") == "" then
+                 mp.set_property("file-local-options/force-media-title",
+                     json.title)
+             end

@@ -8,7 +8,7 @@ class MpvIina < Formula
 
   head do
     patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_aribcaption_bitmap.patch"
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv-iina.patch"
     end
   end
 
