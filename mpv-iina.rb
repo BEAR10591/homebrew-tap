@@ -68,16 +68,6 @@ class MpvIina < Formula
     system "meson", "setup", "build", *args, *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
-
-    # `pkg-config --libs mpv` includes libarchive, but that package is
-    # keg-only so it needs to look for the pkgconfig file in libarchive's opt
-    # path.
-    libarchive = Formula["libarchive"].opt_prefix
-    inreplace lib/"pkgconfig/mpv.pc" do |s|
-     s.gsub!(/^Requires\.private:(.*)\blibarchive\b(.*?)(,.*)?$/,
-             "Requires.private:\\1#{libarchive}/lib/pkgconfig/libarchive.pc\\3")
-    end
-
   end
 
   test do
