@@ -13,8 +13,8 @@ class Ffmpeg < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  stable do
-    def patches
+  def patches
+    stable do
       [
         "https://github.com/FFmpeg/FFmpeg/commit/f758d4fcb93b77115b6d971859f5bee56f8070b8.patch",
         "https://github.com/FFmpeg/FFmpeg/commit/e1dc78a13d2bbce6f1ed525a207427b3ac01eab8.patch",
@@ -23,10 +23,8 @@ class Ffmpeg < Formula
         "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/ffmpeg_libaribcaption_option.patch"
       ]
     end
-  end
 
-  head do
-    def patches
+    head do
       url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption_option.patch"
     end
   end
