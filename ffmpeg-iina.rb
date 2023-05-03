@@ -15,13 +15,13 @@ class FfmpegIina < Formula
 
   stable do
     patch do
-      url "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/ffmpeg_libaribcaption.patch"
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption.patch"
     end
   end
 
   head do
     patch do
-      url "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/ffmpeg_libaribcaption_option.patch"
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption_option.patch"
     end
   end
 
