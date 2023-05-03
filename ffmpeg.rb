@@ -15,13 +15,19 @@ class Ffmpeg < Formula
 
   stable do
     patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption.patch"
+      url "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/ffmpeg/001_commit_f758d4f.patch"
     end
-  end
 
-  head do
     patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption_option.patch"
+      url "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/ffmpeg/002_commit_e1dc78a.patch"
+    end
+
+    patch do
+      url "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/ffmpeg/003_commit_38bb137.patch"
+    end
+
+    patch do
+      url "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/ffmpeg/004_commit_b613863.patch"
     end
   end
 

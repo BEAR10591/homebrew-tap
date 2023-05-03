@@ -1,0 +1,46 @@
+From e1dc78a13d2bbce6f1ed525a207427b3ac01eab8 Mon Sep 17 00:00:00 2001
+From: TADANO Tokumei <aimingoff@pc.nifty.jp>
+Date: Thu, 23 Feb 2023 19:17:16 +0900
+Subject: [PATCH] lavc/codec_desc.c: remove AV_CODEC_PROP_TEXT_SUB property
+ from ARIB_CAPTION
+
+To support bitmap subtitle output, remove AV_CODEC_PROP_TEXT_SUB
+property from codec descriptor for AV_CODEC_ID_ARIB_CAPTION.
+This is similar to `libavcodec/libzvbi-teletextdec.c`
+(AV_CODEC_ID_DVB_TELETEXT).
+
+Instead, each subtitle decoder has to specify a subtitile format.
+`libavcodec/libaribb24.c` uses same AV_CODEC_ID_ARIB_CAPTION and
+expects AV_CODEC_PROP_TEXT_SUB to be set, so this adds a line to
+specify a format there.
+
+Signed-off-by: rcombs <rcombs@rcombs.me>
+---
+ libavcodec/codec_desc.c | 1 -
+ libavcodec/libaribb24.c | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libavcodec/codec_desc.c b/libavcodec/codec_desc.c
+index d912704891a9..efdcb59bc9ac 100644
+--- a/libavcodec/codec_desc.c
++++ b/libavcodec/codec_desc.c
+@@ -3550,7 +3550,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
+         .type      = AVMEDIA_TYPE_SUBTITLE,
+         .name      = "arib_caption",
+         .long_name = NULL_IF_CONFIG_SMALL("ARIB STD-B24 caption"),
+-        .props     = AV_CODEC_PROP_TEXT_SUB,
+         .profiles  = NULL_IF_CONFIG_SMALL(ff_arib_caption_profiles),
+     },
+ 
+diff --git a/libavcodec/libaribb24.c b/libavcodec/libaribb24.c
+index 8ccf3c4b5d84..e3e244be9962 100644
+--- a/libavcodec/libaribb24.c
++++ b/libavcodec/libaribb24.c
+@@ -291,6 +291,7 @@ static int libaribb24_handle_regions(AVCodecContext *avctx, AVSubtitle *sub)
+         av_log(avctx, AV_LOG_DEBUG, "Styled ASS line: %s\n",
+                buf.str);
+ 
++        sub->format = 1; /* text */
+         ret = ff_ass_add_rect(sub, buf.str, b24->read_order++,
+                               0, NULL, NULL);
+     }
