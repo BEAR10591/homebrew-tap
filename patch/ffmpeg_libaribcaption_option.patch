@@ -16,7 +16,7 @@ index 747ca8a..c80d3c7 100644
        OFFSET(ass_single_rect), AV_OPT_TYPE_BOOL, { .i64 = ASS_SINGLE_RECT }, 0, 1, SD },
      { "font", "comma-separated font family [ass, bitmap]",
 -      OFFSET(font), AV_OPT_TYPE_STRING, { .str = NULL }, 0, 0, SD },
-+      OFFSET(font), AV_OPT_TYPE_STRING, { .str = "Hiragino Maru Gothic ProN,Rounded M+ 1m for ARIB" }, 0, 0, SD },
++      OFFSET(font), AV_OPT_TYPE_STRING, { .str = 'Hiragino Maru Gothic ProN,Rounded M+ 1m for ARIB' }, 0, 0, SD },
      { "replace_fullwidth_ascii", "replace MSZ fullwidth alphanumerics with halfwidth alphanumerics [ass, bitmap]",
 -      OFFSET(replace_fullwidth_ascii), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, SD },
 +      OFFSET(replace_fullwidth_ascii), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, SD },

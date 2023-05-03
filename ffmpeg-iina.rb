@@ -13,9 +13,15 @@ class FfmpegIina < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  head do
-    patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption_option.patch"
+  stable do
+    def patches
+      [
+        "https://github.com/FFmpeg/FFmpeg/commit/f758d4fcb93b77115b6d971859f5bee56f8070b8.patch",
+        "https://github.com/FFmpeg/FFmpeg/commit/e1dc78a13d2bbce6f1ed525a207427b3ac01eab8.patch",
+        "https://github.com/FFmpeg/FFmpeg/commit/38bb137e9923a4c4c64befcf8b5fda29691440e0.patch",
+        "https://github.com/FFmpeg/FFmpeg/commit/b6138633cdf2ecae22c4c02029e91245c430c4fe.patch",
+        "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/ffmpeg_libaribcaption_option.patch"
+      ]
     end
   end
 

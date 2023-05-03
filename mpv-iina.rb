@@ -7,8 +7,11 @@ class MpvIina < Formula
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
   stable do
-    patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv-iina.patch"
+    def patches
+      [
+        "https://github.com/mpv-player/mpv/commit/0da0acdae8e729eecfb2498ac11cb86a7fe3360d.patch",
+        "https://github.com/mpv-player/mpv/pull/11648.patch"
+      ]
     end
   end
 
@@ -45,6 +48,7 @@ class MpvIina < Formula
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["libarchive"].opt_lib/"pkgconfig"
 
     args = %W[
+      -Ddvbin=enabled
       -Dhtml-build=disabled
       -Djavascript=enabled
       -Dlibmpv=true

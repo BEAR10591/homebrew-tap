@@ -6,9 +6,12 @@ class Mpv < Formula
   license :cannot_represent
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  head do
-    patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_aribcaption_bitmap.patch"
+  stable do
+    def patches
+      [
+        "https://github.com/mpv-player/mpv/commit/0da0acdae8e729eecfb2498ac11cb86a7fe3360d.patch",
+        "https://github.com/mpv-player/mpv/pull/11648.patch"
+      ]
     end
   end
 
@@ -44,6 +47,7 @@ class Mpv < Formula
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["libarchive"].opt_lib/"pkgconfig"
 
     args = %W[
+      -Ddvbin=enabled
       -Dhtml-build=enabled
       -Djavascript=enabled
       -Dlibmpv=true
