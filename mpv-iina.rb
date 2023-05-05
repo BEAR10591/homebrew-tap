@@ -4,6 +4,7 @@ class MpvIina < Formula
   url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.35.1.tar.gz"
   sha256 "41df981b7b84e33a2ef4478aaf81d6f4f5c8b9cd2c0d337ac142fc20b387d1a9"
   license :cannot_represent
+  revision 2
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
   head do
@@ -70,15 +71,16 @@ class MpvIina < Formula
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
 
-    # `pkg-config --libs mpv` includes libarchive, but that package is
-    # keg-only so it needs to look for the pkgconfig file in libarchive's opt
-    # path.
-    libarchive = Formula["libarchive"].opt_prefix
-    inreplace lib/"pkgconfig/mpv.pc" do |s|
-     s.gsub!(/^Requires\.private:(.*)\blibarchive\b(.*?)(,.*)?$/,
-             "Requires.private:\\1#{libarchive}/lib/pkgconfig/libarchive.pc\\3")
+    if OS.mac?
+      # `pkg-config --libs mpv` includes libarchive, but that package is
+      # keg-only so it needs to look for the pkgconfig file in libarchive's opt
+      # path.
+      libarchive = Formula["libarchive"].opt_prefix
+      inreplace lib/"pkgconfig/mpv.pc" do |s|
+        s.gsub!(/^Requires\.private:(.*)\blibarchive\b(.*?)(,.*)?$/,
+                "Requires.private:\\1#{libarchive}/lib/pkgconfig/libarchive.pc\\3")
+      end
     end
-
   end
 
   test do
