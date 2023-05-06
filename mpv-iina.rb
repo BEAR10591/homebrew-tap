@@ -20,7 +20,7 @@ class MpvIina < Formula
   depends_on "pkg-config" => [:build, :test]
   depends_on xcode: :build
 
-  depends_on "ffmpeg-iina"
+  depends_on "bear10591/tap/ffmpeg-iina"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
