@@ -7,14 +7,10 @@ class Mpv < Formula
   revision 2
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  stable do
+  head do
     patch do
-      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11235.patch"
+      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
     end
-  end
-
-  patch do
-    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
   end
 
   depends_on "docutils" => :build
