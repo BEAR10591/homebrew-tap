@@ -20,7 +20,7 @@ class MpvIina < Formula
   depends_on "pkg-config" => [:build, :test]
   depends_on xcode: :build
 
-  depends_on "bear10591/tap/ffmpeg-iina"
+  depends_on "ffmpeg-iina"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
@@ -32,9 +32,6 @@ class MpvIina < Formula
   depends_on "uchardet"
   # depends_on "vapoursynth"
   depends_on "yt-dlp"
-
-  # Fix ytdl issue. Remove after next mpv release.
-  patch :DATA
 
   def install
     # LANG is unset by default on macOS and causes issues when calling getlocale
