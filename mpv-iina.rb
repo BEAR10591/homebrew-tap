@@ -9,7 +9,7 @@ class MpvIina < Formula
 
   head do
     patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_PR_11648.patch"
+      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
     end
   end
 
@@ -33,6 +33,9 @@ class MpvIina < Formula
   # depends_on "vapoursynth"
   depends_on "yt-dlp"
 
+  # Fix ytdl issue. Remove after next mpv release.
+  patch :DATA
+
   def install
     # LANG is unset by default on macOS and causes issues when calling getlocale
     # or getdefaultlocale in docutils. Force the default c/posix locale since
@@ -46,7 +49,6 @@ class MpvIina < Formula
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["libarchive"].opt_lib/"pkgconfig"
 
     args = %W[
-      -Ddvbin=enabled
       -Dhtml-build=disabled
       -Djavascript=enabled
       -Dlibmpv=true
@@ -71,16 +73,15 @@ class MpvIina < Formula
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
 
-    if OS.mac?
-      # `pkg-config --libs mpv` includes libarchive, but that package is
-      # keg-only so it needs to look for the pkgconfig file in libarchive's opt
-      # path.
-      libarchive = Formula["libarchive"].opt_prefix
-      inreplace lib/"pkgconfig/mpv.pc" do |s|
-        s.gsub!(/^Requires\.private:(.*)\blibarchive\b(.*?)(,.*)?$/,
-                "Requires.private:\\1#{libarchive}/lib/pkgconfig/libarchive.pc\\3")
-      end
+    # `pkg-config --libs mpv` includes libarchive, but that package is
+    # keg-only so it needs to look for the pkgconfig file in libarchive's opt
+    # path.
+    libarchive = Formula["libarchive"].opt_prefix
+    inreplace lib/"pkgconfig/mpv.pc" do |s|
+     s.gsub!(/^Requires\.private:(.*)\blibarchive\b(.*?)(,.*)?$/,
+             "Requires.private:\\1#{libarchive}/lib/pkgconfig/libarchive.pc\\3")
     end
+
   end
 
   test do
