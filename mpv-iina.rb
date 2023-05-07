@@ -7,6 +7,17 @@ class MpvIina < Formula
   revision 2
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
+  stable do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_libaribcaption.patch"
+    end
+
+    # Fix ytdl issue. Remove after next mpv release.
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_ytdl-hook.patch"
+    end
+  end
+
   head do
     patch do
       url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"

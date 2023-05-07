@@ -7,6 +7,17 @@ class Mpv < Formula
   revision 2
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
+  stable do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_libaribcaption.patch"
+    end
+
+    # Fix ytdl issue. Remove after next mpv release.
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_ytdl-hook.patch"
+    end
+  end
+
   head do
     patch do
       url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
@@ -17,7 +28,7 @@ class Mpv < Formula
   depends_on "meson" => :build
   depends_on "pkg-config" => [:build, :test]
   depends_on xcode: :build
-  depends_on "ber10591/tap/ffmpeg"
+  depends_on "bear10591/tap/ffmpeg"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
@@ -73,18 +84,6 @@ class Mpv < Formula
 
     bash_completion.install "etc/mpv.bash-completion" => "mpv"
     zsh_completion.install "etc/_mpv.zsh" => "_mpv"
-
-    inreplace "TOOLS/dylib-unhell.py", "libraries(lib, result)",
-              "lib = lib.replace(\"@loader_path\", \"" + "#{HOMEBREW_PREFIX}/lib" + "\"); libraries(lib, result)"
-    inreplace "TOOLS/dylib-unhell.py", "libraries(lib, result)",
-              "lib = lib.replace(      \"@rpath\", \"" + "#{HOMEBREW_PREFIX}/lib" + "\"); libraries(lib, result)"
-    system "python3.11", "TOOLS/osxbundle.py", "build/mpv"
-    bindir = "build/mpv.app/Contents/MacOS/"
-    rm   bindir + "mpv-bundle"
-    mv   bindir + "mpv", bindir + "mpv-bundle"
-    ln_s "mpv-bundle", bindir + "mpv"
-    system "codesign", "--deep", "-fs", "-", "build/mpv.app"
-    prefix.install "build/mpv.app"
   end
 
   test do
