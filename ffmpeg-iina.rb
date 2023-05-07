@@ -13,6 +13,12 @@ class FfmpegIina < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  stable do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption.patch"
+    end
+  end
+
   keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use and has no binaraies (ffmpeg, ffplay etc.)"
 
   depends_on "pkg-config" => :build

@@ -13,6 +13,12 @@ class Ffmpeg < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  stable do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption.patch"
+    end
+  end
+
   depends_on "pkg-config" => :build
   depends_on "aom"
   depends_on "dav1d"
