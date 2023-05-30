@@ -1,14 +1,16 @@
 class Mkvtoolnix < Formula
   desc "Matroska media files manipulation tools"
   homepage "https://mkvtoolnix.download/"
-  url "https://mkvtoolnix.download/sources/mkvtoolnix-76.0.tar.xz"
-  mirror "https://fossies.org/linux/misc/mkvtoolnix-76.0.tar.xz"
-  sha256 "6ace661b61a49d1026b1a97336051d7aa85d56fb34527f2ca97d8933f7efe90d"
   license "GPL-2.0-or-later"
+  revision 1
 
-  livecheck do
-    url "https://mkvtoolnix.download/sources/"
-    regex(/href=.*?mkvtoolnix[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  stable do
+    url "https://mkvtoolnix.download/sources/mkvtoolnix-76.0.tar.xz"
+    mirror "https://fossies.org/linux/misc/mkvtoolnix-76.0.tar.xz"
+    sha256 "6ace661b61a49d1026b1a97336051d7aa85d56fb34527f2ca97d8933f7efe90d"
+    # Add fmt 10 support, the full patch does not apply to stable
+    # https://gitlab.com/mbunkus/mkvtoolnix/-/commit/24716ce95bf5b10d685611de23489045cf2ca5cc
+    patch :DATA
   end
 
   head do
@@ -81,3 +83,17 @@ class Mkvtoolnix < Formula
     system "#{bin}/mkvextract", "tracks", mkv_path, "0:#{sub_path}"
   end
 end
+
+__END__
+diff --git a/src/common/codec.h b/src/common/codec.h
+index f8bc1b4e36cb01e3e9096e681e4211e04903410b..f4a92c3223044664c454399423fa7df33f1cbca6 100644
+--- a/src/common/codec.h
++++ b/src/common/codec.h
+@@ -231,3 +231,7 @@ operator <<(std::ostream &out,
+
+   return out;
+ }
++
++#if FMT_VERSION >= 90000
++template <> struct fmt::formatter<codec_c> : ostream_formatter {};
++#endif  // FMT_VERSION >= 90000
