@@ -5,7 +5,7 @@ class Mpv < Formula
   sha256 "41df981b7b84e33a2ef4478aaf81d6f4f5c8b9cd2c0d337ac142fc20b387d1a9"
   license :cannot_represent
   revision 2
-  head "https://github.com/mpv-player/mpv.git", branch: "master"
+  head "https://github.com/rcombs/mpv.git", branch: "mac_vulkan"
 
   stable do
     patch do
@@ -32,6 +32,7 @@ class Mpv < Formula
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
+  depends_on "libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
   depends_on "mujs"
