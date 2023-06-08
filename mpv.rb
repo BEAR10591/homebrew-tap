@@ -59,7 +59,7 @@ class Mpv < Formula
     args = %W[
       -Dhtml-build=enabled
       -Djavascript=enabled
-      -Dlibmpv=false
+      -Dlibmpv=true
       -Dlua=luajit
       -Dlibarchive=enabled
       -Duchardet=enabled
