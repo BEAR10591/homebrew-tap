@@ -63,6 +63,9 @@ class Mpv < Formula
       -Dlua=luajit
       -Dlibarchive=enabled
       -Duchardet=enabled
+      -Dvulkan=enabled
+      -Dlibplacebo=enabled
+      -Dlibplacebo-next=enabled
       --sysconfdir=#{pkgetc}
       --datadir=#{pkgshare}
       --mandir=#{man}
