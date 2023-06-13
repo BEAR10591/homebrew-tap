@@ -124,6 +124,7 @@ class Ffmpeg < Formula
       --enable-libzimg
       --enable-libjxl
       --enable-libwebp
+      --enable-vulkan
       --disable-libjack
       --disable-indev=jack
     ]
