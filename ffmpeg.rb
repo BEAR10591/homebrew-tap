@@ -30,7 +30,7 @@ class Ffmpeg < Formula
   depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
-  depends_on "libplacebo"
+  depends_on "bear10591/tap/libplacebo"
   depends_on "librist"
   depends_on "libsoxr"
   depends_on "libvidstab"
