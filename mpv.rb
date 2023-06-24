@@ -5,7 +5,7 @@ class Mpv < Formula
   sha256 "41df981b7b84e33a2ef4478aaf81d6f4f5c8b9cd2c0d337ac142fc20b387d1a9"
   license :cannot_represent
   revision 2
-  head "https://github.com/rcombs/mpv.git", branch: "mac_vulkan"
+  head "https://github.com/mpv-player/mpv.git", branch: "master"
 
   stable do
     patch do
@@ -21,6 +21,10 @@ class Mpv < Formula
   head do
     patch do
       url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
+    end
+
+    patch do
+      url "https://github.com/mpv-player/mpv/compare/master...rcombs:mpv:avfoundation.patch"
     end
   end
 
