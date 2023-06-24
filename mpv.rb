@@ -7,24 +7,13 @@ class Mpv < Formula
   revision 2
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  stable do
-    patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_libaribcaption.patch"
-    end
-
-    # Fix ytdl issue. Remove after next mpv release.
-    patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_ytdl-hook.patch"
-    end
-  end
-
   head do
     patch do
-      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
+      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11488.patch"
     end
 
     patch do
-      url "https://github.com/mpv-player/mpv/compare/master...rcombs:mpv:avfoundation.patch"
+      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
     end
   end
 
@@ -67,6 +56,7 @@ class Mpv < Formula
       -Dlua=luajit
       -Dlibarchive=enabled
       -Duchardet=enabled
+      -Davfoundation=enabled
       --sysconfdir=#{pkgetc}
       --datadir=#{pkgshare}
       --mandir=#{man}
