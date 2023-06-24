@@ -9,11 +9,11 @@ class Mpv < Formula
 
   head do
     patch do
-      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11488.patch"
+      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
     end
 
     patch do
-      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
+      url "https://github.com/mpv-player/mpv/compare/master...rcombs:mpv:avfoundation.patch"
     end
   end
 
