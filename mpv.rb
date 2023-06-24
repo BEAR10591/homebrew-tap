@@ -15,7 +15,6 @@ class Mpv < Formula
     patch do
       url "https://github.com/mpv-player/mpv/compare/master...rcombs:mpv:avfoundation.patch"
     end
-
   end
 
   depends_on "docutils" => :build

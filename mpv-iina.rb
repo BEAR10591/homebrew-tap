@@ -7,20 +7,13 @@ class MpvIina < Formula
   revision 2
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  stable do
-    patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_libaribcaption.patch"
-    end
-
-    # Fix ytdl issue. Remove after next mpv release.
-    patch do
-      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_ytdl-hook.patch"
-    end
-  end
-
   head do
     patch do
       url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
+    end
+
+    patch do
+      url "https://github.com/mpv-player/mpv/compare/master...rcombs:mpv:avfoundation.patch"
     end
   end
 
@@ -30,18 +23,17 @@ class MpvIina < Formula
   depends_on "meson" => :build
   depends_on "pkg-config" => [:build, :test]
   depends_on xcode: :build
-
   depends_on "bear10591/tap/ffmpeg-iina"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
+  depends_on "libbluray"
+  # depends_on "libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
-  depends_on "libbluray"
-
   depends_on "mujs"
   depends_on "uchardet"
-  # depends_on "vapoursynth"
+  depends_on "vapoursynth"
   depends_on "yt-dlp"
 
   def install
@@ -63,6 +55,8 @@ class MpvIina < Formula
       -Dlua=luajit
       -Dlibarchive=enabled
       -Duchardet=enabled
+      -Davfoundation=enabled
+      -Dcoreaudio=disabled
 
       -Dlibbluray=enabled
       -Dcplayer=false
