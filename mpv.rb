@@ -58,6 +58,7 @@ class Mpv < Formula
       -Dlibarchive=enabled
       -Duchardet=enabled
       -Davfoundation=enabled
+      -Dcoreaudio=disabled
       --sysconfdir=#{pkgetc}
       --datadir=#{pkgshare}
       --mandir=#{man}
