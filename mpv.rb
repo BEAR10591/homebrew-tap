@@ -1,20 +1,19 @@
 class Mpv < Formula
   desc "Media player based on MPlayer and mplayer2"
   homepage "https://mpv.io"
-  url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.35.1.tar.gz"
-  sha256 "41df981b7b84e33a2ef4478aaf81d6f4f5c8b9cd2c0d337ac142fc20b387d1a9"
+  url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.36.0.tar.gz"
+  sha256 "29abc44f8ebee013bb2f9fe14d80b30db19b534c679056e4851ceadf5a5e8bf6"
   license :cannot_represent
-  revision 2
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  head do
-    patch do
-      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
-    end
+  # sd_lavc: support rendering bitmap subtitles with libaribcaption
+  patch do
+    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
+  end
 
-    patch do
-      url "https://github.com/mpv-player/mpv/compare/master...rcombs:mpv:avfoundation.patch"
-    end
+  # ao: add a new ao "avfoundation" to support spatial audio in macOS
+  patch do
+    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11955.patch"
   end
 
   depends_on "docutils" => :build
@@ -25,7 +24,6 @@ class Mpv < Formula
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
-  # depends_on "libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
   depends_on "mujs"
@@ -80,18 +78,6 @@ class Mpv < Formula
 
     bash_completion.install "etc/mpv.bash-completion" => "mpv"
     zsh_completion.install "etc/_mpv.zsh" => "_mpv"
-
-    inreplace "TOOLS/dylib-unhell.py", "libraries(lib, result)",
-              "lib = lib.replace(\"@loader_path\", \"" + "#{HOMEBREW_PREFIX}/lib" + "\"); libraries(lib, result)"
-    inreplace "TOOLS/dylib-unhell.py", "libraries(lib, result)",
-              "lib = lib.replace(      \"@rpath\", \"" + "#{HOMEBREW_PREFIX}/lib" + "\"); libraries(lib, result)"
-    system "python3.11", "TOOLS/osxbundle.py", "build/mpv"
-    bindir = "build/mpv.app/Contents/MacOS/"
-    rm   bindir + "mpv-bundle"
-    mv   bindir + "mpv", bindir + "mpv-bundle"
-    ln_s "mpv-bundle", bindir + "mpv"
-    system "codesign", "--deep", "-fs", "-", "build/mpv.app"
-    prefix.install "build/mpv.app"
   end
 
   test do

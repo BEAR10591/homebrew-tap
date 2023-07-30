@@ -30,7 +30,7 @@ class Ffmpeg < Formula
   depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
-  depends_on "bear10591/tap/libplacebo"
+  # depends_on "libplacebo"
   depends_on "librist"
   depends_on "libsoxr"
   depends_on "libvidstab"
@@ -92,7 +92,6 @@ class Ffmpeg < Formula
       --enable-libdav1d
       --enable-libmp3lame
       --enable-libopus
-      --enable-libplacebo
       --enable-librav1e
       --enable-librist
       --enable-librubberband
@@ -124,7 +123,8 @@ class Ffmpeg < Formula
       --enable-libzimg
       --enable-libjxl
       --enable-libwebp
-      --enable-vulkan
+      --disable-vulkan
+      --disable-libplacebo
       --disable-libjack
       --disable-indev=jack
     ]
