@@ -13,6 +13,12 @@ class FfmpegIina < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  stable do
+    patch do
+      url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/ffmpeg_libaribcaption.patch"
+    end
+  end
+
   keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use and has no binaraies (ffmpeg, ffplay etc.)"
 
   depends_on "pkg-config" => :build
@@ -29,11 +35,11 @@ class FfmpegIina < Formula
   depends_on "rubberband"
   depends_on "snappy"
   depends_on "speex"
-  depends_on "tesseract"
+  # depends_on "tesseract"
   depends_on "xz"
   depends_on "zeromq"
   depends_on "zimg"
-  depends_on "jpeg-xl" # for JPEG-XL format screenshot
+  # depends_on "jpeg-xl" # for JPEG-XL format screenshot
   depends_on "webp" # for webp format screenshot
 
   on_intel do
@@ -62,7 +68,7 @@ class FfmpegIina < Formula
       --enable-libdav1d
       --enable-librubberband
       --enable-libsnappy
-      --enable-libtesseract
+      --disable-libtesseract
       --enable-libvidstab
       --enable-libxml2
       --enable-libfontconfig
@@ -74,7 +80,6 @@ class FfmpegIina < Formula
       --enable-videotoolbox
       --enable-libzmq
       --enable-libzimg
-      --enable-libjxl
       --enable-libwebp
       --disable-libjack
       --disable-indev=jack

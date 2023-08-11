@@ -1,20 +1,19 @@
 class MpvIina < Formula
   desc "Media player based on MPlayer and mplayer2"
   homepage "https://mpv.io"
-  url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.35.1.tar.gz"
-  sha256 "41df981b7b84e33a2ef4478aaf81d6f4f5c8b9cd2c0d337ac142fc20b387d1a9"
+  url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.36.0.tar.gz"
+  sha256 "29abc44f8ebee013bb2f9fe14d80b30db19b534c679056e4851ceadf5a5e8bf6"
   license :cannot_represent
-  revision 2
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  head do
-    patch do
-      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
-    end
+  # sd_lavc: support rendering bitmap subtitles with libaribcaption
+  patch do
+    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11648.patch"
+  end
 
-    patch do
-      url "https://github.com/mpv-player/mpv/compare/master...rcombs:mpv:avfoundation.patch"
-    end
+  # ao: add a new ao "avfoundation" to support spatial audio in macOS
+  patch do
+    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11955.patch"
   end
 
   keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use"
@@ -23,17 +22,18 @@ class MpvIina < Formula
   depends_on "meson" => :build
   depends_on "pkg-config" => [:build, :test]
   depends_on xcode: :build
+
   depends_on "bear10591/tap/ffmpeg-iina"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
-  depends_on "libbluray"
-  # depends_on "libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
+  depends_on "libbluray"
+
   depends_on "mujs"
   depends_on "uchardet"
-  depends_on "vapoursynth"
+  # depends_on "vapoursynth"
   depends_on "yt-dlp"
 
   def install
@@ -56,7 +56,7 @@ class MpvIina < Formula
       -Dlibarchive=enabled
       -Duchardet=enabled
       -Davfoundation=enabled
-      -Dcoreaudio=disabled
+      -Dcoreaudio=enabled
 
       -Dlibbluray=enabled
       -Dcplayer=false
