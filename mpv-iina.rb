@@ -16,6 +16,10 @@ class MpvIina < Formula
     url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11955.patch"
   end
 
+  patch do
+    url "https://gist.githubusercontent.com/lhc70000/2e4028a67a38d81d28157789c20109e6/raw/a0bab7f44658aae1991cab0ad5b13fac8fa23861/revert-meson.patch"
+  end
+
   keg_only "it is intended to only be used for building IINA. This formula is not recommended for daily use"
 
   depends_on "docutils" => :build

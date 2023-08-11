@@ -16,10 +16,6 @@ class Mpv < Formula
     url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11955.patch"
   end
 
-  patch do
-    url "https://gist.githubusercontent.com/lhc70000/2e4028a67a38d81d28157789c20109e6/raw/a0bab7f44658aae1991cab0ad5b13fac8fa23861/revert-meson.patch"
-  end
-
   depends_on "docutils" => :build
   depends_on "meson" => :build
   depends_on "pkg-config" => [:build, :test]
