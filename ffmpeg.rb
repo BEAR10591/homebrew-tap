@@ -35,11 +35,11 @@ class Ffmpeg < Formula
   depends_on "freetype"
   depends_on "frei0r"
   depends_on "gnutls"
+  depends_on "jpeg-xl"
   depends_on "lame"
   depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
-  # depends_on "bear10591/tap/libplacebo"
   depends_on "librist"
   depends_on "libsoxr"
   depends_on "libvidstab"
@@ -65,8 +65,6 @@ class Ffmpeg < Formula
   depends_on "xz"
   depends_on "zeromq"
   depends_on "zimg"
-  depends_on "jpeg-xl"
-  depends_on "webp"
 
   uses_from_macos "bzip2"
   uses_from_macos "libxml2"
@@ -109,6 +107,7 @@ class Ffmpeg < Formula
       --enable-libaribcaption
       --enable-libbluray
       --enable-libdav1d
+      --enable-libjxl
       --enable-libmp3lame
       --enable-libopus
       --enable-librav1e
@@ -140,10 +139,6 @@ class Ffmpeg < Formula
       --enable-libsoxr
       --enable-libzmq
       --enable-libzimg
-      --enable-libjxl
-      --enable-libwebp
-      --disable-vulkan
-      --disable-libplacebo
       --disable-libjack
       --disable-indev=jack
     ]
