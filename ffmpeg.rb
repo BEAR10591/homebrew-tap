@@ -60,7 +60,7 @@ class Ffmpeg < Formula
   depends_on "theora"
   depends_on "webp"
   depends_on "x264"
-  depends_on "bear10591/tap/x265"
+  depends_on "x265"
   depends_on "xvid"
   depends_on "xz"
   depends_on "zeromq"
