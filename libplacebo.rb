@@ -7,15 +7,20 @@ class Libplacebo < Formula
   head "https://code.videolan.org/videolan/libplacebo.git", branch: "master"
 
   stable do
-    url "https://code.videolan.org/videolan/libplacebo/-/archive/v6.292.0/libplacebo-v6.292.0.tar.bz2"
-    sha256 "9182be99fc5e27f64e9193ba371380b10d5f78d09836c0afad1d3998f275e72b"
+    url "https://code.videolan.org/videolan/libplacebo/-/archive/v6.338.0/libplacebo-v6.338.0.tar.bz2"
+    sha256 "256c5cb01cafddc341bb7cd4df9b17f7e92b943e6cf5696ec1bd5cd1d5a381c8"
 
-    resource "glad" do
+    resource "fast_float" do
+      url "https://github.com/fastfloat/fast_float/archive/refs/tags/v5.2.0.tar.gz"
+      sha256 "72bbfd1914e414c920e39abdc81378adf910a622b62c45b4c61d344039425d18"
+    end
+
+    resource "glad2" do
       url "https://files.pythonhosted.org/packages/8b/b3/191508033476b6a409c070c6166b1c41ebb547cc6136260e9157343e6a2b/glad2-2.0.4.tar.gz"
       sha256 "ede1639f69f2ba08f1f498a40a707f34a609d24eb2ea0d6c9364689a798cf7d0"
     end
 
-    resource "jinja" do
+    resource "jinja2" do
       url "https://files.pythonhosted.org/packages/7a/ff/75c28576a1d900e87eb6335b063fab47a8ef3c8b4d88524c4bf78f670cce/Jinja2-3.1.2.tar.gz"
       sha256 "31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"
     end
