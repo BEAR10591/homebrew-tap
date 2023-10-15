@@ -24,6 +24,7 @@ class Mpv < Formula
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
+  depends_on "ber10591/tap/libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
   depends_on "mujs"
@@ -53,9 +54,11 @@ class Mpv < Formula
       -Dlibmpv=true
       -Dlua=luajit
       -Dlibarchive=enabled
+      -Dlibplacebo=enabled
       -Duchardet=enabled
       -Davfoundation=enabled
       -Dcoreaudio=enabled
+      -Dvulkan=enabled
       --sysconfdir=#{pkgetc}
       --datadir=#{pkgshare}
       --mandir=#{man}
