@@ -44,7 +44,15 @@ class Libplacebo < Formula
 
   def install
     resources.each do |r|
-      r.stage(Pathname("3rdparty")/r.name)
+      # Override resource name to use expected directory name
+      dir_name = case r.name
+      when "glad2", "jinja2"
+        r.name.sub(/\d+$/, "")
+      else
+        r.name
+      end
+
+      r.stage(Pathname("3rdparty")/dir_name)
     end
 
     system "meson", "setup", "build",
