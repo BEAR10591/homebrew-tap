@@ -1,53 +1,7 @@
-From 4bf31dc15fb6d1f93d12ecf21fad5e695f0db5c0 Mon Sep 17 00:00:00 2001
-From: lwWang <liwei@multicorewareinc.com>
-Date: Thu, 26 Aug 2021 15:15:59 +0800
-Subject: [PATCH] merge the neon intrinsics from Handbrake
-
-Co-authored-by: Josh Dekker <josh@itanimul.li>
-Co-authored-by: Jean-Baptiste Kempf <jb@videolan.org>
-
-Contributed by Apple under MIT license
----
- source/CMakeLists.txt                     |   83 +-
- source/common/CMakeLists.txt              |   51 +-
- source/common/aarch64/arm64-utils.cpp     |  300 +++
- source/common/aarch64/arm64-utils.h       |   15 +
- source/common/aarch64/asm-primitives.cpp  |   71 +-
- source/common/aarch64/dct-prim.cpp        |  949 ++++++++++
- source/common/aarch64/dct-prim.h          |   19 +
- source/common/aarch64/filter-prim.cpp     |  973 ++++++++++
- source/common/aarch64/filter-prim.h       |   21 +
- source/common/aarch64/intrapred-prim.cpp  |  264 +++
- source/common/aarch64/intrapred-prim.h    |   15 +
- source/common/aarch64/ipfilter8.h         |   75 +-
- source/common/aarch64/loopfilter-prim.cpp |  290 +++
- source/common/aarch64/loopfilter-prim.h   |   16 +
- source/common/aarch64/pixel-prim.cpp      | 2063 +++++++++++++++++++++
- source/common/aarch64/pixel-prim.h        |   23 +
- source/common/aarch64/pixel-util.h        |   21 +-
- source/common/aarch64/pixel.h             |  233 ++-
- source/common/cpu.cpp                     |   20 +-
- source/test/CMakeLists.txt                |   16 +-cpp
- source/test/testbench.cpp                 |    5 +-
- source/test/testharness.h                 |    8 +-
- 22 files changed, 5311 insertions(+), 220 deletions(-)
- create mode 100644 source/common/aarch64/arm64-utils.cpp
- create mode 100644 source/common/aarch64/arm64-utils.h
- create mode 100644 source/common/aarch64/dct-prim.cpp
- create mode 100644 source/common/aarch64/dct-prim.h
- create mode 100644 source/common/aarch64/filter-prim.cpp
- create mode 100644 source/common/aarch64/filter-prim.h
- create mode 100644 source/common/aarch64/intrapred-prim.cpp
- create mode 100644 source/common/aarch64/intrapred-prim.h
- create mode 100644 source/common/aarch64/loopfilter-prim.cpp
- create mode 100644 source/common/aarch64/loopfilter-prim.h
- create mode 100644 source/common/aarch64/pixel-prim.cpp
- create mode 100644 source/common/aarch64/pixel-prim.h
-
-diff -Naur ./source/CMakeLists.txt b/source/CMakeLists.txt
+diff -Naur ./source/CMakeLists.txt ../source/CMakeLists.txt
 index b0ccef6ba..23af32111 100755
 --- ./source/CMakeLists.txt
-+++ b/source/CMakeLists.txt
++++ ../source/CMakeLists.txt
 @@ -38,14 +38,20 @@ configure_file("${PROJECT_SOURCE_DIR}/x265_config.h.in"
  SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 
@@ -175,10 +129,10 @@ index b0ccef6ba..23af32111 100755
              list(APPEND ASM_SRCS ${ASM_SRC})
              list(APPEND ASM_OBJS ${ASM}.${SUFFIX})
              add_custom_command(
-diff -Naur ./source/common/CMakeLists.txt b/source/common/CMakeLists.txt
+diff -Naur ./source/common/CMakeLists.txt ../source/common/CMakeLists.txt
 index 12b643ad5..2be305cac 100644
 --- ./source/common/CMakeLists.txt
-+++ b/source/common/CMakeLists.txt
++++ ../source/common/CMakeLists.txt
 @@ -84,35 +84,38 @@ if(ENABLE_ASSEMBLY AND X86)
  endif(ENABLE_ASSEMBLY AND X86)
 
@@ -242,11 +196,11 @@ index 12b643ad5..2be305cac 100644
 
  if(POWER)
      set_source_files_properties(version.cpp PROPERTIES COMPILE_FLAGS -DX265_VERSION=${X265_VERSION})
-diff -Naur ./source/common/aarch64/arm64-utils.cpp b/source/common/aarch64/arm64-utils.cpp
+diff -Naur ./source/common/aarch64/arm64-utils.cpp ../source/common/aarch64/arm64-utils.cpp
 new file mode 100644
 index 000000000..8f6328967
 --- /dev/null
-+++ b/source/common/aarch64/arm64-utils.cpp
++++ ../source/common/aarch64/arm64-utils.cpp
 @@ -0,0 +1,300 @@
 +#include "common.h"
 +#include "x265.h"
@@ -548,11 +502,11 @@ index 000000000..8f6328967
 +
 +
 +
-diff -Naur ./source/common/aarch64/arm64-utils.h b/source/common/aarch64/arm64-utils.h
+diff -Naur ./source/common/aarch64/arm64-utils.h ../source/common/aarch64/arm64-utils.h
 new file mode 100644
 index 000000000..91d7f0b67
 --- /dev/null
-+++ b/source/common/aarch64/arm64-utils.h
++++ ../source/common/aarch64/arm64-utils.h
 @@ -0,0 +1,15 @@
 +#ifndef __ARM64_UTILS_H__
 +#define __ARM64_UTILS_H__
@@ -569,10 +523,10 @@ index 000000000..91d7f0b67
 +}
 +
 +#endif
-diff -Naur ./source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
+diff -Naur ./source/common/aarch64/asm-primitives.cpp ../source/common/aarch64/asm-primitives.cpp
 index e0265e3ac..c41bb4c31 100644
 --- ./source/common/aarch64/asm-primitives.cpp
-+++ b/source/common/aarch64/asm-primitives.cpp
++++ ../source/common/aarch64/asm-primitives.cpp
 @@ -22,6 +22,7 @@
   * For more information, contact us at license @ x265.com.
   *****************************************************************************/
@@ -733,11 +687,11 @@ index e0265e3ac..c41bb4c31 100644
      }
  }
  } // namespace X265_NS
-diff -Naur ./source/common/aarch64/dct-prim.cpp b/source/common/aarch64/dct-prim.cpp
+diff -Naur ./source/common/aarch64/dct-prim.cpp ../source/common/aarch64/dct-prim.cpp
 new file mode 100644
 index 000000000..27ab7d567
 --- /dev/null
-+++ b/source/common/aarch64/dct-prim.cpp
++++ ../source/common/aarch64/dct-prim.cpp
 @@ -0,0 +1,949 @@
 +#include "dct-prim.h"
 +
@@ -1688,11 +1642,11 @@ index 000000000..27ab7d567
 +
 +
 +#endif
-diff -Naur ./source/common/aarch64/dct-prim.h b/source/common/aarch64/dct-prim.h
+diff -Naur ./source/common/aarch64/dct-prim.h ../source/common/aarch64/dct-prim.h
 new file mode 100644
 index 000000000..fe81b93d3
 --- /dev/null
-+++ b/source/common/aarch64/dct-prim.h
++++ ../source/common/aarch64/dct-prim.h
 @@ -0,0 +1,19 @@
 +#ifndef __DCT_PRIM_NEON_H__
 +#define __DCT_PRIM_NEON_H__
@@ -1713,11 +1667,11 @@ index 000000000..fe81b93d3
 +
 +#endif
 +
-diff -Naur ./source/common/aarch64/filter-prim.cpp b/source/common/aarch64/filter-prim.cpp
+diff -Naur ./source/common/aarch64/filter-prim.cpp ../source/common/aarch64/filter-prim.cpp
 new file mode 100644
 index 000000000..8029a6e9f
 --- /dev/null
-+++ b/source/common/aarch64/filter-prim.cpp
++++ ../source/common/aarch64/filter-prim.cpp
 @@ -0,0 +1,973 @@
 +#if HAVE_NEON
 +
@@ -2692,11 +2646,11 @@ index 000000000..8029a6e9f
 +#endif
 +
 +
-diff -Naur ./source/common/aarch64/filter-prim.h b/source/common/aarch64/filter-prim.h
+diff -Naur ./source/common/aarch64/filter-prim.h ../source/common/aarch64/filter-prim.h
 new file mode 100644
 index 000000000..6f0208cef
 --- /dev/null
-+++ b/source/common/aarch64/filter-prim.h
++++ ../source/common/aarch64/filter-prim.h
 @@ -0,0 +1,21 @@
 +#ifndef _FILTER_PRIM_ARM64_H__
 +#define _FILTER_PRIM_ARM64_H__
@@ -2719,11 +2673,11 @@ index 000000000..6f0208cef
 +
 +#endif
 +
-diff -Naur ./source/common/aarch64/intrapred-prim.cpp b/source/common/aarch64/intrapred-prim.cpp
+diff -Naur ./source/common/aarch64/intrapred-prim.cpp ../source/common/aarch64/intrapred-prim.cpp
 new file mode 100644
 index 000000000..dd2e0b237
 --- /dev/null
-+++ b/source/common/aarch64/intrapred-prim.cpp
++++ ../source/common/aarch64/intrapred-prim.cpp
 @@ -0,0 +1,264 @@
 +#include "common.h"
 +#include "primitives.h"
@@ -2989,11 +2943,11 @@ index 000000000..dd2e0b237
 +
 +
 +
-diff -Naur ./source/common/aarch64/intrapred-prim.h b/source/common/aarch64/intrapred-prim.h
+diff -Naur ./source/common/aarch64/intrapred-prim.h ../source/common/aarch64/intrapred-prim.h
 new file mode 100644
 index 000000000..31da91dfa
 --- /dev/null
-+++ b/source/common/aarch64/intrapred-prim.h
++++ ../source/common/aarch64/intrapred-prim.h
 @@ -0,0 +1,15 @@
 +#ifndef INTRAPRED_PRIM_H__
 +
@@ -3010,10 +2964,10 @@ index 000000000..31da91dfa
 +
 +#endif
 +
-diff -Naur ./source/common/aarch64/ipfilter8.h b/source/common/aarch64/ipfilter8.h
+diff -Naur ./source/common/aarch64/ipfilter8.h ../source/common/aarch64/ipfilter8.h
 index f9ed91e2e..f0c7de365 100644
 --- ./source/common/aarch64/ipfilter8.h
-+++ b/source/common/aarch64/ipfilter8.h
++++ ../source/common/aarch64/ipfilter8.h
 @@ -25,31 +25,56 @@
  #define X265_IPFILTER8_AARCH64_H
 
@@ -3096,11 +3050,11 @@ index f9ed91e2e..f0c7de365 100644
 
 
  #endif // ifndef X265_IPFILTER8_AARCH64_H
-diff -Naur ./source/common/aarch64/loopfilter-prim.cpp b/source/common/aarch64/loopfilter-prim.cpp
+diff -Naur ./source/common/aarch64/loopfilter-prim.cpp ../source/common/aarch64/loopfilter-prim.cpp
 new file mode 100644
 index 000000000..898583243
 --- /dev/null
-+++ b/source/common/aarch64/loopfilter-prim.cpp
++++ ../source/common/aarch64/loopfilter-prim.cpp
 @@ -0,0 +1,290 @@
 +#include "loopfilter-prim.h"
 +
@@ -3392,11 +3346,11 @@ index 000000000..898583243
 +
 +
 +}
-diff -Naur ./source/common/aarch64/loopfilter-prim.h b/source/common/aarch64/loopfilter-prim.h
+diff -Naur ./source/common/aarch64/loopfilter-prim.h ../source/common/aarch64/loopfilter-prim.h
 new file mode 100644
 index 000000000..c155da83f
 --- /dev/null
-+++ b/source/common/aarch64/loopfilter-prim.h
++++ ../source/common/aarch64/loopfilter-prim.h
 @@ -0,0 +1,16 @@
 +#ifndef _LOOPFILTER_NEON_H__
 +#define _LOOPFILTER_NEON_H__
@@ -3414,11 +3368,11 @@ index 000000000..c155da83f
 +
 +
 +#endif
-diff -Naur ./source/common/aarch64/pixel-prim.cpp b/source/common/aarch64/pixel-prim.cpp
+diff -Naur ./source/common/aarch64/pixel-prim.cpp ../source/common/aarch64/pixel-prim.cpp
 new file mode 100644
 index 000000000..c3fb4476b
 --- /dev/null
-+++ b/source/common/aarch64/pixel-prim.cpp
++++ ../source/common/aarch64/pixel-prim.cpp
 @@ -0,0 +1,2063 @@
 +#include "common.h"
 +#include "slicetype.h"      // LOWRES_COST_MASK
@@ -5483,11 +5437,11 @@ index 000000000..c3fb4476b
 +
 +#endif
 +
-diff -Naur ./source/common/aarch64/pixel-prim.h b/source/common/aarch64/pixel-prim.h
+diff -Naur ./source/common/aarch64/pixel-prim.h ../source/common/aarch64/pixel-prim.h
 new file mode 100644
 index 000000000..da9f1822b
 --- /dev/null
-+++ b/source/common/aarch64/pixel-prim.h
++++ ../source/common/aarch64/pixel-prim.h
 @@ -0,0 +1,23 @@
 +#ifndef PIXEL_PRIM_NEON_H__
 +#define PIXEL_PRIM_NEON_H__
@@ -5512,10 +5466,10 @@ index 000000000..da9f1822b
 +
 +#endif
 +
-diff -Naur ./source/common/aarch64/pixel-util.h b/source/common/aarch64/pixel-util.h
+diff -Naur ./source/common/aarch64/pixel-util.h ../source/common/aarch64/pixel-util.h
 index 043488468..f6dd6f643 100644
 --- ./source/common/aarch64/pixel-util.h
-+++ b/source/common/aarch64/pixel-util.h
++++ ../source/common/aarch64/pixel-util.h
 @@ -25,16 +25,17 @@
  #ifndef X265_PIXEL_UTIL_AARCH64_H
  #define X265_PIXEL_UTIL_AARCH64_H
@@ -5544,10 +5498,10 @@ index 043488468..f6dd6f643 100644
 +int PFX(psyCost_4x4_neon)(const pixel *source, intptr_t sstride, const pixel *recon, intptr_t rstride);
 
  #endif // ifndef X265_PIXEL_UTIL_AARCH64_H
-diff -Naur ./source/common/aarch64/pixel.h b/source/common/aarch64/pixel.h
+diff -Naur ./source/common/aarch64/pixel.h ../source/common/aarch64/pixel.h
 index 179c2f4ec..74e75cf96 100644
 --- ./source/common/aarch64/pixel.h
-+++ b/source/common/aarch64/pixel.h
++++ ../source/common/aarch64/pixel.h
 @@ -2,6 +2,8 @@
   * Copyright (C) 2020 MulticoreWare, Inc
   *
@@ -5796,10 +5750,10 @@ index 179c2f4ec..74e75cf96 100644
 
 -#endif // ifndef X265_I386_PIXEL_AARCH64_H
 +#endif // ifndef x265_AARCH64_PIXEL_H
-diff -Naur ./source/common/cpu.cpp b/source/common/cpu.cpp
+diff -Naur ./source/common/cpu.cpp ../source/common/cpu.cpp
 index 2eacfe4a9..ce428c929 100644
 --- ./source/common/cpu.cpp
-+++ b/source/common/cpu.cpp
++++ ../source/common/cpu.cpp
 @@ -7,6 +7,8 @@
   *          Steve Borho <steve@borho.org>
   *          Hongbin Liu <liuhongbin1@huawei.com>
@@ -5845,10 +5799,10 @@ index 2eacfe4a9..ce428c929 100644
  #elif X265_ARCH_POWER8
 
  uint32_t cpu_detect(bool benableavx512)
-diff -Naur ./source/test/CMakeLists.txt b/source/test/CMakeLists.txt
+diff -Naur ./source/test/CMakeLists.txt ../source/test/CMakeLists.txt
 index 9abaf31ff..260195f53 100644
 --- ./source/test/CMakeLists.txt
-+++ b/source/test/CMakeLists.txt
++++ ../source/test/CMakeLists.txt
 @@ -23,15 +23,13 @@ endif(X86)
 
  # add ARM assembly files
@@ -5872,10 +5826,10 @@ index 9abaf31ff..260195f53 100644
  endif(ARM OR CROSS_COMPILE_ARM)
 
  # add PowerPC assembly files
-diff -Naur ./source/test/testbench.cpp b/source/test/testbench.cpp
+diff -Naur ./source/test/testbench.cpp ../source/test/testbench.cpp
 index 8db8c0c25..97d3119b4 100644
 --- ./source/test/testbench.cpp
-+++ b/source/test/testbench.cpp
++++ ../source/test/testbench.cpp
 @@ -208,7 +208,6 @@ int main(int argc, char *argv[])
 
          EncoderPrimitives asmprim;
@@ -5909,10 +5863,10 @@ index 8db8c0c25..97d3119b4 100644
      /* Note that we do not setup aliases for performance tests, that would be
       * redundant. The testbench only verifies they are correctly aliased */
 
-diff -Naur ./source/test/testharness.h b/source/test/testharness.h
+diff -Naur ./source/test/testharness.h ../source/test/testharness.h
 index 088343b51..c03d7c2f5 100644
 --- ./source/test/testharness.h
-+++ b/source/test/testharness.h
++++ ../source/test/testharness.h
 @@ -82,15 +82,13 @@ static inline uint32_t __rdtsc(void)
  #if X265_ARCH_X86
      asm volatile("rdtsc" : "=a" (a) ::"edx");
