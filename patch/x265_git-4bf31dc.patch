@@ -27,7 +27,7 @@ Contributed by Apple under MIT license
  source/common/aarch64/pixel-util.h        |   21 +-
  source/common/aarch64/pixel.h             |  233 ++-
  source/common/cpu.cpp                     |   20 +-
- source/test/CMakeLists.txt                |   16 +-
+ source/test/CMakeLists.txt                |   16 +-cpp
  source/test/testbench.cpp                 |    5 +-
  source/test/testharness.h                 |    8 +-
  22 files changed, 5311 insertions(+), 220 deletions(-)
@@ -44,13 +44,13 @@ Contributed by Apple under MIT license
  create mode 100644 source/common/aarch64/pixel-prim.cpp
  create mode 100644 source/common/aarch64/pixel-prim.h
 
-diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+diff -Naur ./source/CMakeLists.txt b/source/CMakeLists.txt
 index b0ccef6ba..23af32111 100755
---- a/source/CMakeLists.txt
+--- ./source/CMakeLists.txt
 +++ b/source/CMakeLists.txt
 @@ -38,14 +38,20 @@ configure_file("${PROJECT_SOURCE_DIR}/x265_config.h.in"
  SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
- 
+
  # System architecture detection
 -string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYSPROC)
 +if (APPLE AND CMAKE_OSX_ARCHITECTURES)
@@ -142,7 +142,7 @@ index b0ccef6ba..23af32111 100755
      add_definitions(${ARM_ARGS})
 @@ -353,7 +357,7 @@ if(GCC)
  endif(GCC)
- 
+
  find_package(Nasm)
 -if(ARM OR CROSS_COMPILE_ARM)
 +if(ARM OR CROSS_COMPILE_ARM OR ARM64 OR CROSS_COMPILE_ARM64)
@@ -175,13 +175,13 @@ index b0ccef6ba..23af32111 100755
              list(APPEND ASM_SRCS ${ASM_SRC})
              list(APPEND ASM_OBJS ${ASM}.${SUFFIX})
              add_custom_command(
-diff --git a/source/common/CMakeLists.txt b/source/common/CMakeLists.txt
+diff -Naur ./source/common/CMakeLists.txt b/source/common/CMakeLists.txt
 index 12b643ad5..2be305cac 100644
---- a/source/common/CMakeLists.txt
+--- ./source/common/CMakeLists.txt
 +++ b/source/common/CMakeLists.txt
 @@ -84,35 +84,38 @@ if(ENABLE_ASSEMBLY AND X86)
  endif(ENABLE_ASSEMBLY AND X86)
- 
+
  if(ENABLE_ASSEMBLY AND (ARM OR CROSS_COMPILE_ARM))
 -    if(ARM64)
 -        if(GCC AND (CMAKE_CXX_FLAGS_RELEASE MATCHES "-O3"))
@@ -194,7 +194,7 @@ index 12b643ad5..2be305cac 100644
 -        set(A_SRCS asm.S mc-a.S sad-a.S pixel-util.S ipfilter8.S)
 -        set(VEC_PRIMITIVES)
 +    set(C_SRCS asm-primitives.cpp pixel.h mc.h ipfilter8.h blockcopy8.h dct8.h loopfilter.h)
- 
+
 -        set(ARM_ASMS "${A_SRCS}" CACHE INTERNAL "ARM Assembly Sources")
 -        foreach(SRC ${C_SRCS})
 -            set(ASM_PRIMITIVES ${ASM_PRIMITIVES} aarch64/${SRC})
@@ -204,7 +204,7 @@ index 12b643ad5..2be305cac 100644
 +    # add ARM assembly/intrinsic files here
 +    set(A_SRCS asm.S cpu-a.S mc-a.S sad-a.S pixel-util.S ssd-a.S blockcopy8.S ipfilter8.S dct-a.S)
 +    set(VEC_PRIMITIVES)
- 
+
 -        # add ARM assembly/intrinsic files here
 -        set(A_SRCS asm.S cpu-a.S mc-a.S sad-a.S pixel-util.S ssd-a.S blockcopy8.S ipfilter8.S dct-a.S)
 -        set(VEC_PRIMITIVES)
@@ -214,7 +214,7 @@ index 12b643ad5..2be305cac 100644
 +    endforeach()
 +    source_group(Assembly FILES ${ASM_PRIMITIVES})
 +endif(ENABLE_ASSEMBLY AND (ARM OR CROSS_COMPILE_ARM))
- 
+
 -        set(ARM_ASMS "${A_SRCS}" CACHE INTERNAL "ARM Assembly Sources")
 -        foreach(SRC ${C_SRCS})
 -            set(ASM_PRIMITIVES ${ASM_PRIMITIVES} arm/${SRC})
@@ -239,10 +239,10 @@ index 12b643ad5..2be305cac 100644
      source_group(Assembly FILES ${ASM_PRIMITIVES})
 -endif(ENABLE_ASSEMBLY AND (ARM OR CROSS_COMPILE_ARM))
 +endif(ENABLE_ASSEMBLY AND (ARM64 OR CROSS_COMPILE_ARM64))
- 
+
  if(POWER)
      set_source_files_properties(version.cpp PROPERTIES COMPILE_FLAGS -DX265_VERSION=${X265_VERSION})
-diff --git a/source/common/aarch64/arm64-utils.cpp b/source/common/aarch64/arm64-utils.cpp
+diff -Naur ./source/common/aarch64/arm64-utils.cpp b/source/common/aarch64/arm64-utils.cpp
 new file mode 100644
 index 000000000..8f6328967
 --- /dev/null
@@ -548,7 +548,7 @@ index 000000000..8f6328967
 +
 +
 +
-diff --git a/source/common/aarch64/arm64-utils.h b/source/common/aarch64/arm64-utils.h
+diff -Naur ./source/common/aarch64/arm64-utils.h b/source/common/aarch64/arm64-utils.h
 new file mode 100644
 index 000000000..91d7f0b67
 --- /dev/null
@@ -569,14 +569,14 @@ index 000000000..91d7f0b67
 +}
 +
 +#endif
-diff --git a/source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
+diff -Naur ./source/common/aarch64/asm-primitives.cpp b/source/common/aarch64/asm-primitives.cpp
 index e0265e3ac..c41bb4c31 100644
---- a/source/common/aarch64/asm-primitives.cpp
+--- ./source/common/aarch64/asm-primitives.cpp
 +++ b/source/common/aarch64/asm-primitives.cpp
 @@ -22,6 +22,7 @@
   * For more information, contact us at license @ x265.com.
   *****************************************************************************/
- 
+
 +
  #include "common.h"
  #include "primitives.h"
@@ -584,7 +584,7 @@ index e0265e3ac..c41bb4c31 100644
 @@ -35,18 +36,25 @@
  #define GCC_4_9_0 40900
  #define GCC_5_1_0 50100
- 
+
 +#include "pixel-prim.h"
 +#include "filter-prim.h"
 +#include "dct-prim.h"
@@ -596,13 +596,13 @@ index e0265e3ac..c41bb4c31 100644
  #include "pixel-util.h"
  #include "ipfilter8.h"
  }
- 
+
 -namespace X265_NS {
 +namespace X265_NS
 +{
  // private x265 namespace
- 
- 
+
+
  template<int size>
 -void interp_8tap_hv_pp_cpu(const pixel* src, intptr_t srcStride, pixel* dst, intptr_t dstStride, int idxX, int idxY)
 +void interp_8tap_hv_pp_cpu(const pixel *src, intptr_t srcStride, pixel *dst, intptr_t dstStride, int idxX, int idxY)
@@ -613,16 +613,16 @@ index e0265e3ac..c41bb4c31 100644
          asmp.pu[LUMA_64x16].luma_vsp = cp.pu[LUMA_64x16].luma_vsp;
          asmp.pu[LUMA_64x32].luma_vsp = cp.pu[LUMA_64x32].luma_vsp;
          asmp.pu[LUMA_64x48].luma_vsp = cp.pu[LUMA_64x48].luma_vsp;
--        asmp.pu[LUMA_64x64].luma_vsp = cp.pu[LUMA_64x64].luma_vsp;    
+-        asmp.pu[LUMA_64x64].luma_vsp = cp.pu[LUMA_64x64].luma_vsp;
 +        asmp.pu[LUMA_64x64].luma_vsp = cp.pu[LUMA_64x64].luma_vsp;
  #if !AUTO_VECTORIZE || GCC_VERSION < GCC_4_9_0 /* gcc_version < gcc-4.9.0 */
          asmp.pu[LUMA_4x4].luma_vsp   = cp.pu[LUMA_4x4].luma_vsp;
          asmp.pu[LUMA_4x8].luma_vsp   = cp.pu[LUMA_4x8].luma_vsp;
 @@ -97,35 +105,30 @@ void setupAliasCPrimitives(EncoderPrimitives &cp, EncoderPrimitives &asmp, int c
  }
- 
- 
--void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask) 
+
+
+-void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask)
 +void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask)
  {
      if (cpuMask & X265_CPU_NEON)
@@ -631,7 +631,7 @@ index e0265e3ac..c41bb4c31 100644
 +    	  // quant
          p.quant = PFX(quant_neon);
 -
-+        
++
  #if !HIGH_BIT_DEPTH
 -        p.pu[LUMA_4x4].satd   = PFX(pixel_satd_4x4_neon);
          p.pu[LUMA_4x8].satd   = PFX(pixel_satd_4x8_neon);
@@ -639,7 +639,7 @@ index e0265e3ac..c41bb4c31 100644
 -        p.pu[LUMA_8x4].satd   = PFX(pixel_satd_8x4_neon);
 -        p.pu[LUMA_8x8].satd   = PFX(pixel_satd_8x8_neon);
 -        p.pu[LUMA_12x16].satd = PFX(pixel_satd_12x16_neon);
--        
+-
 -        p.chroma[X265_CSP_I420].pu[CHROMA_420_4x4].satd    = PFX(pixel_satd_4x4_neon);
 +
          p.chroma[X265_CSP_I420].pu[CHROMA_420_4x8].satd    = PFX(pixel_satd_4x8_neon);
@@ -647,7 +647,7 @@ index e0265e3ac..c41bb4c31 100644
 -        p.chroma[X265_CSP_I420].pu[CHROMA_420_8x4].satd    = PFX(pixel_satd_8x4_neon);
 -        p.chroma[X265_CSP_I420].pu[CHROMA_420_8x8].satd    = PFX(pixel_satd_8x8_neon);
 -        p.chroma[X265_CSP_I420].pu[CHROMA_420_12x16].satd  = PFX(pixel_satd_12x16_neon);
--        
+-
 -        p.chroma[X265_CSP_I422].pu[CHROMA_422_4x4].satd    = PFX(pixel_satd_4x4_neon);
 +
 +
@@ -663,20 +663,20 @@ index e0265e3ac..c41bb4c31 100644
 +        p.chroma[X265_CSP_I420].pu[CHROMA_420_12x16].satd  = PFX(pixel_satd_12x16_neon);
 +#endif // defined(__APPLE__)
 +
- 
+
          p.pu[LUMA_4x4].pixelavg_pp[NONALIGNED]   = PFX(pixel_avg_pp_4x4_neon);
          p.pu[LUMA_4x8].pixelavg_pp[NONALIGNED]   = PFX(pixel_avg_pp_4x8_neon);
 @@ -153,15 +156,18 @@ void setupAssemblyPrimitives(EncoderPrimitives &p, int cpuMask)
          p.pu[LUMA_8x16].sad_x4  = PFX(sad_x4_8x16_neon);
          p.pu[LUMA_8x32].sad_x4  = PFX(sad_x4_8x32_neon);
- 
-+        
+
++
          // luma_hps
          p.pu[LUMA_4x4].luma_hps   = PFX(interp_8tap_horiz_ps_4x4_neon);
          p.pu[LUMA_4x8].luma_hps   = PFX(interp_8tap_horiz_ps_4x8_neon);
          p.pu[LUMA_4x16].luma_hps  = PFX(interp_8tap_horiz_ps_4x16_neon);
 +        p.pu[LUMA_12x16].luma_hps = PFX(interp_8tap_horiz_ps_12x16_neon);
-+        
++
 +#if !defined(__APPLE__)
          p.pu[LUMA_8x4].luma_hps   = PFX(interp_8tap_horiz_ps_8x4_neon);
          p.pu[LUMA_8x8].luma_hps   = PFX(interp_8tap_horiz_ps_8x8_neon);
@@ -693,7 +693,7 @@ index e0265e3ac..c41bb4c31 100644
 -#endif
 +#endif // !AUTO_VECTORIZE || GCC_VERSION < GCC_5_1_0
 +#endif // !defined(__APPLE__)
- 
+
 -        p.pu[LUMA_8x4].luma_hvpp   =  interp_8tap_hv_pp_cpu<LUMA_8x4>;
 -        p.pu[LUMA_8x8].luma_hvpp   =  interp_8tap_hv_pp_cpu<LUMA_8x8>;
 -        p.pu[LUMA_8x16].luma_hvpp  =  interp_8tap_hv_pp_cpu<LUMA_8x16>;
@@ -721,10 +721,10 @@ index e0265e3ac..c41bb4c31 100644
 -#endif
 +#endif // !AUTO_VECTORIZE || GCC_VERSION < GCC_4_9_0
 +#endif // !defined(__APPLE__) && (!AUTO_VECTORIZE || GCC_VERSION < GCC_5_1_0)
- 
+
          p.cu[BLOCK_4x4].psy_cost_pp = PFX(psyCost_4x4_neon);
  #endif // !HIGH_BIT_DEPTH
- 
+
 +        setupPixelPrimitives_neon(p);
 +        setupFilterPrimitives_neon(p);
 +        setupDCTPrimitives_neon(p);
@@ -733,7 +733,7 @@ index e0265e3ac..c41bb4c31 100644
      }
  }
  } // namespace X265_NS
-diff --git a/source/common/aarch64/dct-prim.cpp b/source/common/aarch64/dct-prim.cpp
+diff -Naur ./source/common/aarch64/dct-prim.cpp b/source/common/aarch64/dct-prim.cpp
 new file mode 100644
 index 000000000..27ab7d567
 --- /dev/null
@@ -1688,7 +1688,7 @@ index 000000000..27ab7d567
 +
 +
 +#endif
-diff --git a/source/common/aarch64/dct-prim.h b/source/common/aarch64/dct-prim.h
+diff -Naur ./source/common/aarch64/dct-prim.h b/source/common/aarch64/dct-prim.h
 new file mode 100644
 index 000000000..fe81b93d3
 --- /dev/null
@@ -1713,7 +1713,7 @@ index 000000000..fe81b93d3
 +
 +#endif
 +
-diff --git a/source/common/aarch64/filter-prim.cpp b/source/common/aarch64/filter-prim.cpp
+diff -Naur ./source/common/aarch64/filter-prim.cpp b/source/common/aarch64/filter-prim.cpp
 new file mode 100644
 index 000000000..8029a6e9f
 --- /dev/null
@@ -2399,16 +2399,16 @@ index 000000000..8029a6e9f
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].filter_vss = interp_vert_ss_neon<4, W, H>;  \
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].p2s[NONALIGNED] = filterPixelToShort_neon<W, H>;\
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].p2s[ALIGNED] = filterPixelToShort_neon<W, H>;
-+    
++
 +#define CHROMA_FILTER_420(W, H) \
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].filter_hps = interp_horiz_ps_neon<4, W, H>;
-+    
++
 +#else // defined(__APPLE__)
 +#define CHROMA_420(W, H) \
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].filter_vss = interp_vert_ss_neon<4, W, H>; \
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].p2s[NONALIGNED] = filterPixelToShort_neon<W, H>;\
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].p2s[ALIGNED] = filterPixelToShort_neon<W, H>;
-+    
++
 +#define CHROMA_FILTER_420(W, H) \
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].filter_hpp = interp_horiz_pp_neon<4, W, H>; \
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_ ## W ## x ## H].filter_hps = interp_horiz_ps_neon<4, W, H>; \
@@ -2426,16 +2426,16 @@ index 000000000..8029a6e9f
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].filter_vss = interp_vert_ss_neon<4, W, H>;  \
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].p2s[NONALIGNED] = filterPixelToShort_neon<W, H>;\
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].p2s[ALIGNED] = filterPixelToShort_neon<W, H>;
-+    
++
 +#define CHROMA_FILTER_422(W, H) \
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].filter_hps = interp_horiz_ps_neon<4, W, H>;
-+    
++
 +#else // defined(__APPLE__)
 +#define CHROMA_422(W, H) \
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].filter_vss = interp_vert_ss_neon<4, W, H>; \
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].p2s[NONALIGNED] = filterPixelToShort_neon<W, H>;\
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].p2s[ALIGNED] = filterPixelToShort_neon<W, H>;
-+    
++
 +#define CHROMA_FILTER_422(W, H) \
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].filter_hpp = interp_horiz_pp_neon<4, W, H>; \
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_ ## W ## x ## H].filter_hps = interp_horiz_ps_neon<4, W, H>; \
@@ -2456,12 +2456,12 @@ index 000000000..8029a6e9f
 +
 +#define CHROMA_FILTER_444(W, H) \
 +    p.chroma[X265_CSP_I444].pu[LUMA_ ## W ## x ## H].filter_hps = interp_horiz_ps_neon<4, W, H>;
-+    
++
 +#else // defined(__APPLE__)
 +#define CHROMA_444(W, H) \
 +    p.chroma[X265_CSP_I444].pu[LUMA_ ## W ## x ## H].p2s[NONALIGNED] = filterPixelToShort_neon<W, H>;\
 +    p.chroma[X265_CSP_I444].pu[LUMA_ ## W ## x ## H].p2s[ALIGNED] = filterPixelToShort_neon<W, H>;
-+    
++
 +#define CHROMA_FILTER_444(W, H) \
 +    p.chroma[X265_CSP_I444].pu[LUMA_ ## W ## x ## H].filter_hpp = interp_horiz_pp_neon<4, W, H>; \
 +    p.chroma[X265_CSP_I444].pu[LUMA_ ## W ## x ## H].filter_hps = interp_horiz_ps_neon<4, W, H>; \
@@ -2481,13 +2481,13 @@ index 000000000..8029a6e9f
 +    p.pu[LUMA_ ## W ## x ## H].luma_hvpp    = interp_hv_pp_neon<8, W, H>; \
 +    p.pu[LUMA_ ## W ## x ## H].convert_p2s[NONALIGNED] = filterPixelToShort_neon<W, H>;\
 +    p.pu[LUMA_ ## W ## x ## H].convert_p2s[ALIGNED] = filterPixelToShort_neon<W, H>;
-+    
++
 +#else // defined(__APPLE__)
 +#define LUMA(W, H) \
 +    p.pu[LUMA_ ## W ## x ## H].luma_vss     = interp_vert_ss_neon<8, W, H>;  \
 +    p.pu[LUMA_ ## W ## x ## H].convert_p2s[NONALIGNED] = filterPixelToShort_neon<W, H>;\
 +    p.pu[LUMA_ ## W ## x ## H].convert_p2s[ALIGNED] = filterPixelToShort_neon<W, H>;
-+    
++
 +#define LUMA_FILTER(W, H) \
 +    p.pu[LUMA_ ## W ## x ## H].luma_hpp     = interp_horiz_pp_neon<8, W, H>; \
 +    p.pu[LUMA_ ## W ## x ## H].luma_vpp     = interp_vert_pp_neon<8, W, H>;  \
@@ -2604,23 +2604,23 @@ index 000000000..8029a6e9f
 +    LUMA_FILTER(8, 16);
 +    LUMA_FILTER(8, 32);
 +    LUMA_FILTER(24, 32);
-+    
++
 +    CHROMA_FILTER_420(24, 32);
-+    
++
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_32x8].filter_hpp = interp_horiz_pp_neon<4, 32, 8>;
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_32x16].filter_hpp = interp_horiz_pp_neon<4, 32, 16>;
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_32x24].filter_hpp = interp_horiz_pp_neon<4, 32, 24>;
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_32x32].filter_hpp = interp_horiz_pp_neon<4, 32, 32>;
-+    
++
 +    CHROMA_FILTER_422(24, 64);
-+    
++
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_32x16].filter_hpp = interp_horiz_pp_neon<4, 32, 16>;
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_32x32].filter_hpp = interp_horiz_pp_neon<4, 32, 32>;
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_32x48].filter_hpp = interp_horiz_pp_neon<4, 32, 48>;
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_32x64].filter_hpp = interp_horiz_pp_neon<4, 32, 64>;
-+    
++
 +    CHROMA_FILTER_444(24, 32);
-+    
++
 +    p.chroma[X265_CSP_I444].pu[LUMA_32x8].filter_hpp  = interp_horiz_pp_neon<4, 32, 8>;
 +    p.chroma[X265_CSP_I444].pu[LUMA_32x16].filter_hpp = interp_horiz_pp_neon<4, 32, 16>;
 +    p.chroma[X265_CSP_I444].pu[LUMA_32x24].filter_hpp = interp_horiz_pp_neon<4, 32, 24>;
@@ -2631,7 +2631,7 @@ index 000000000..8029a6e9f
 +    p.chroma[X265_CSP_I444].pu[LUMA_64x32].filter_hpp = interp_horiz_pp_neon<4, 64, 32>;
 +    p.chroma[X265_CSP_I444].pu[LUMA_64x48].filter_hpp = interp_horiz_pp_neon<4, 64, 48>;
 +    p.chroma[X265_CSP_I444].pu[LUMA_64x64].filter_hpp = interp_horiz_pp_neon<4, 64, 64>;
-+    
++
 +    p.chroma[X265_CSP_I444].pu[LUMA_16x4].filter_vss  = interp_vert_ss_neon<4, 16, 4>;
 +    p.chroma[X265_CSP_I444].pu[LUMA_16x8].filter_vss  = interp_vert_ss_neon<4, 16, 8>;
 +    p.chroma[X265_CSP_I444].pu[LUMA_16x12].filter_vss = interp_vert_ss_neon<4, 16, 12>;
@@ -2651,19 +2651,19 @@ index 000000000..8029a6e9f
 +    CHROMA_FILTER_420(8, 8);
 +    CHROMA_FILTER_420(8, 16);
 +    CHROMA_FILTER_420(8, 32);
-+    
++
 +    CHROMA_FILTER_422(8, 4);
 +    CHROMA_FILTER_422(8, 8);
 +    CHROMA_FILTER_422(8, 12);
 +    CHROMA_FILTER_422(8, 16);
 +    CHROMA_FILTER_422(8, 32);
 +    CHROMA_FILTER_422(8, 64);
-+    
++
 +    CHROMA_FILTER_444(8, 4);
 +    CHROMA_FILTER_444(8, 8);
 +    CHROMA_FILTER_444(8, 16);
 +    CHROMA_FILTER_444(8, 32);
-+    
++
 +#if defined(__APPLE__)
 +    CHROMA_FILTER_420(16, 4);
 +    CHROMA_FILTER_420(16, 8);
@@ -2676,7 +2676,7 @@ index 000000000..8029a6e9f
 +    CHROMA_FILTER_422(16, 24);
 +    CHROMA_FILTER_422(16, 32);
 +    CHROMA_FILTER_422(16, 64);
-+    
++
 +    CHROMA_FILTER_444(16, 4);
 +    CHROMA_FILTER_444(16, 8);
 +    CHROMA_FILTER_444(16, 12);
@@ -2692,7 +2692,7 @@ index 000000000..8029a6e9f
 +#endif
 +
 +
-diff --git a/source/common/aarch64/filter-prim.h b/source/common/aarch64/filter-prim.h
+diff -Naur ./source/common/aarch64/filter-prim.h b/source/common/aarch64/filter-prim.h
 new file mode 100644
 index 000000000..6f0208cef
 --- /dev/null
@@ -2719,7 +2719,7 @@ index 000000000..6f0208cef
 +
 +#endif
 +
-diff --git a/source/common/aarch64/intrapred-prim.cpp b/source/common/aarch64/intrapred-prim.cpp
+diff -Naur ./source/common/aarch64/intrapred-prim.cpp b/source/common/aarch64/intrapred-prim.cpp
 new file mode 100644
 index 000000000..dd2e0b237
 --- /dev/null
@@ -2989,7 +2989,7 @@ index 000000000..dd2e0b237
 +
 +
 +
-diff --git a/source/common/aarch64/intrapred-prim.h b/source/common/aarch64/intrapred-prim.h
+diff -Naur ./source/common/aarch64/intrapred-prim.h b/source/common/aarch64/intrapred-prim.h
 new file mode 100644
 index 000000000..31da91dfa
 --- /dev/null
@@ -3010,14 +3010,14 @@ index 000000000..31da91dfa
 +
 +#endif
 +
-diff --git a/source/common/aarch64/ipfilter8.h b/source/common/aarch64/ipfilter8.h
+diff -Naur ./source/common/aarch64/ipfilter8.h b/source/common/aarch64/ipfilter8.h
 index f9ed91e2e..f0c7de365 100644
---- a/source/common/aarch64/ipfilter8.h
+--- ./source/common/aarch64/ipfilter8.h
 +++ b/source/common/aarch64/ipfilter8.h
 @@ -25,31 +25,56 @@
  #define X265_IPFILTER8_AARCH64_H
- 
- 
+
+
 -void x265_interp_8tap_horiz_ps_4x4_neon(const pixel* src, intptr_t srcStride, int16_t* dst, intptr_t dstStride, int coeffIdx, int isRowExt);
 -void x265_interp_8tap_horiz_ps_4x8_neon(const pixel* src, intptr_t srcStride, int16_t* dst, intptr_t dstStride, int coeffIdx, int isRowExt);
 -void x265_interp_8tap_horiz_ps_4x16_neon(const pixel* src, intptr_t srcStride, int16_t* dst, intptr_t dstStride, int coeffIdx, int isRowExt);
@@ -3093,10 +3093,10 @@ index f9ed91e2e..f0c7de365 100644
 +        int coeffIdx, int isRowExt);
 +void x265_interp_8tap_horiz_ps_64x64_neon(const pixel *src, intptr_t srcStride, int16_t *dst, intptr_t dstStride,
 +        int coeffIdx, int isRowExt);
- 
- 
+
+
  #endif // ifndef X265_IPFILTER8_AARCH64_H
-diff --git a/source/common/aarch64/loopfilter-prim.cpp b/source/common/aarch64/loopfilter-prim.cpp
+diff -Naur ./source/common/aarch64/loopfilter-prim.cpp b/source/common/aarch64/loopfilter-prim.cpp
 new file mode 100644
 index 000000000..898583243
 --- /dev/null
@@ -3392,7 +3392,7 @@ index 000000000..898583243
 +
 +
 +}
-diff --git a/source/common/aarch64/loopfilter-prim.h b/source/common/aarch64/loopfilter-prim.h
+diff -Naur ./source/common/aarch64/loopfilter-prim.h b/source/common/aarch64/loopfilter-prim.h
 new file mode 100644
 index 000000000..c155da83f
 --- /dev/null
@@ -3414,7 +3414,7 @@ index 000000000..c155da83f
 +
 +
 +#endif
-diff --git a/source/common/aarch64/pixel-prim.cpp b/source/common/aarch64/pixel-prim.cpp
+diff -Naur ./source/common/aarch64/pixel-prim.cpp b/source/common/aarch64/pixel-prim.cpp
 new file mode 100644
 index 000000000..c3fb4476b
 --- /dev/null
@@ -5194,7 +5194,7 @@ index 000000000..c3fb4476b
 +    LUMA_PU(48, 64);
 +    LUMA_PU(64, 16);
 +    LUMA_PU(16, 64);
-+    
++
 +#if defined(__APPLE__)
 +    p.pu[LUMA_4x4].sad = sad_pp_neon<4, 4>;
 +    p.pu[LUMA_4x8].sad = sad_pp_neon<4, 8>;
@@ -5216,7 +5216,7 @@ index 000000000..c3fb4476b
 +
 +    p.pu[LUMA_4x4].satd   = pixel_satd_4x4_neon;
 +    p.pu[LUMA_8x4].satd   = pixel_satd_8x4_neon;
-+    
++
 +    p.pu[LUMA_8x8].satd   = satd8_neon<8, 8>;
 +    p.pu[LUMA_16x16].satd = satd8_neon<16, 16>;
 +    p.pu[LUMA_16x8].satd  = satd8_neon<16, 8>;
@@ -5253,7 +5253,7 @@ index 000000000..c3fb4476b
 +    LUMA_CU(16, 16);
 +    LUMA_CU(32, 32);
 +    LUMA_CU(64, 64);
-+    
++
 +#if !(HIGH_BIT_DEPTH)
 +    p.cu[BLOCK_8x8].var   = pixel_var_neon<8>;
 +    p.cu[BLOCK_16x16].var = pixel_var_neon<16>;
@@ -5263,11 +5263,11 @@ index 000000000..c3fb4476b
 +#endif // defined(__APPLE__)
 +#endif // !(HIGH_BIT_DEPTH)
 +
-+    p.cu[BLOCK_16x16].blockfill_s[NONALIGNED] = blockfill_s_neon<16>; 
++    p.cu[BLOCK_16x16].blockfill_s[NONALIGNED] = blockfill_s_neon<16>;
 +    p.cu[BLOCK_16x16].blockfill_s[ALIGNED]    = blockfill_s_neon<16>;
-+    p.cu[BLOCK_32x32].blockfill_s[NONALIGNED] = blockfill_s_neon<32>; 
++    p.cu[BLOCK_32x32].blockfill_s[NONALIGNED] = blockfill_s_neon<32>;
 +    p.cu[BLOCK_32x32].blockfill_s[ALIGNED]    = blockfill_s_neon<32>;
-+    p.cu[BLOCK_64x64].blockfill_s[NONALIGNED] = blockfill_s_neon<64>; 
++    p.cu[BLOCK_64x64].blockfill_s[NONALIGNED] = blockfill_s_neon<64>;
 +    p.cu[BLOCK_64x64].blockfill_s[ALIGNED]    = blockfill_s_neon<64>;
 +
 +
@@ -5277,7 +5277,7 @@ index 000000000..c3fb4476b
 +    p.cu[BLOCK_8x8].calcresidual[ALIGNED]       = getResidual_neon<8>;
 +    p.cu[BLOCK_16x16].calcresidual[NONALIGNED]  = getResidual_neon<16>;
 +    p.cu[BLOCK_16x16].calcresidual[ALIGNED]     = getResidual_neon<16>;
-+    
++
 +#if defined(__APPLE__)
 +    p.cu[BLOCK_32x32].calcresidual[NONALIGNED]  = getResidual_neon<32>;
 +    p.cu[BLOCK_32x32].calcresidual[ALIGNED]     = getResidual_neon<32>;
@@ -5346,7 +5346,7 @@ index 000000000..c3fb4476b
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_24x32].satd = satd8_neon<24, 32>;
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_32x8].satd  = satd8_neon<32, 8>;
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_8x32].satd  = satd8_neon<8, 32>;
-+    
++
 +#if HIGH_BIT_DEPTH
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_4x8].satd   = satd4_neon<4, 8>;
 +    p.chroma[X265_CSP_I420].pu[CHROMA_420_4x16].satd  = satd4_neon<4, 16>;
@@ -5364,7 +5364,7 @@ index 000000000..c3fb4476b
 +    p.chroma[X265_CSP_I420].cu[BLOCK_420_ ## W ## x ## H].sub_ps = pixel_sub_ps_neon<W, H>;  \
 +    p.chroma[X265_CSP_I420].cu[BLOCK_420_ ## W ## x ## H].add_ps[NONALIGNED] = pixel_add_ps_neon<W, H>; \
 +    p.chroma[X265_CSP_I420].cu[BLOCK_420_ ## W ## x ## H].add_ps[ALIGNED] = pixel_add_ps_neon<W, H>;
-+    
++
 +#define CHROMA_CU_S_420(W, H) \
 +    p.chroma[X265_CSP_I420].cu[BLOCK_420_ ## W ## x ## H].copy_pp = blockcopy_pp_neon<W, H>; \
 +    p.chroma[X265_CSP_I420].cu[BLOCK_420_ ## W ## x ## H].copy_ps = blockcopy_ps_neon<W, H>; \
@@ -5433,7 +5433,7 @@ index 000000000..c3fb4476b
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_2x16].satd  = NULL;
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_16x8].satd  = satd8_neon<16, 8>;
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_32x16].satd = satd8_neon<32, 16>;
-+    
++
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_8x12].satd  = satd4_neon<8, 12>;
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_8x64].satd  = satd8_neon<8, 64>;
 +    p.chroma[X265_CSP_I422].pu[CHROMA_422_12x32].satd = satd4_neon<12, 32>;
@@ -5462,8 +5462,8 @@ index 000000000..c3fb4476b
 +    p.chroma[X265_CSP_I422].cu[BLOCK_422_ ## W ## x ## H].sub_ps = pixel_sub_ps_neon<W, H>; \
 +    p.chroma[X265_CSP_I422].cu[BLOCK_422_ ## W ## x ## H].add_ps[NONALIGNED] = pixel_add_ps_neon<W, H>; \
 +    p.chroma[X265_CSP_I422].cu[BLOCK_422_ ## W ## x ## H].add_ps[ALIGNED] = pixel_add_ps_neon<W, H>;
-+    
-+    
++
++
 +    CHROMA_CU_S_422(4, 8)
 +    CHROMA_CU_422(8, 16)
 +    CHROMA_CU_422(16, 32)
@@ -5483,7 +5483,7 @@ index 000000000..c3fb4476b
 +
 +#endif
 +
-diff --git a/source/common/aarch64/pixel-prim.h b/source/common/aarch64/pixel-prim.h
+diff -Naur ./source/common/aarch64/pixel-prim.h b/source/common/aarch64/pixel-prim.h
 new file mode 100644
 index 000000000..da9f1822b
 --- /dev/null
@@ -5512,14 +5512,14 @@ index 000000000..da9f1822b
 +
 +#endif
 +
-diff --git a/source/common/aarch64/pixel-util.h b/source/common/aarch64/pixel-util.h
+diff -Naur ./source/common/aarch64/pixel-util.h b/source/common/aarch64/pixel-util.h
 index 043488468..f6dd6f643 100644
---- a/source/common/aarch64/pixel-util.h
+--- ./source/common/aarch64/pixel-util.h
 +++ b/source/common/aarch64/pixel-util.h
 @@ -25,16 +25,17 @@
  #ifndef X265_PIXEL_UTIL_AARCH64_H
  #define X265_PIXEL_UTIL_AARCH64_H
- 
+
 -int x265_pixel_satd_4x4_neon(const pixel* pix1, intptr_t stride_pix1, const pixel* pix2, intptr_t stride_pix2);
 -int x265_pixel_satd_4x8_neon(const pixel* pix1, intptr_t stride_pix1, const pixel* pix2, intptr_t stride_pix2);
 -int x265_pixel_satd_4x16_neon(const pixel* pix1, intptr_t stride_pix1, const pixel* pix2, intptr_t stride_pix2);
@@ -5536,17 +5536,17 @@ index 043488468..f6dd6f643 100644
 +int x265_pixel_satd_8x8_neon(const pixel *pix1, intptr_t stride_pix1, const pixel *pix2, intptr_t stride_pix2);
 +int x265_pixel_satd_12x16_neon(const pixel *pix1, intptr_t stride_pix1, const pixel *pix2, intptr_t stride_pix2);
 +int x265_pixel_satd_12x32_neon(const pixel *pix1, intptr_t stride_pix1, const pixel *pix2, intptr_t stride_pix2);
- 
+
 -uint32_t x265_quant_neon(const int16_t* coef, const int32_t* quantCoeff, int32_t* deltaU, int16_t* qCoef, int qBits, int add, int numCoeff);
 -int PFX(psyCost_4x4_neon)(const pixel* source, intptr_t sstride, const pixel* recon, intptr_t rstride);
 +uint32_t x265_quant_neon(const int16_t *coef, const int32_t *quantCoeff, int32_t *deltaU, int16_t *qCoef, int qBits,
 +                         int add, int numCoeff);
 +int PFX(psyCost_4x4_neon)(const pixel *source, intptr_t sstride, const pixel *recon, intptr_t rstride);
- 
+
  #endif // ifndef X265_PIXEL_UTIL_AARCH64_H
-diff --git a/source/common/aarch64/pixel.h b/source/common/aarch64/pixel.h
+diff -Naur ./source/common/aarch64/pixel.h b/source/common/aarch64/pixel.h
 index 179c2f4ec..74e75cf96 100644
---- a/source/common/aarch64/pixel.h
+--- ./source/common/aarch64/pixel.h
 +++ b/source/common/aarch64/pixel.h
 @@ -2,6 +2,8 @@
   * Copyright (C) 2020 MulticoreWare, Inc
@@ -5560,12 +5560,12 @@ index 179c2f4ec..74e75cf96 100644
 @@ -21,85 +23,160 @@
   * For more information, contact us at license @ x265.com.
   *****************************************************************************/
- 
+
 -#ifndef X265_I386_PIXEL_AARCH64_H
 -#define X265_I386_PIXEL_AARCH64_H
 +#ifndef x265_AARCH64_PIXEL_H
 +#define x265_AARCH64_PIXEL_H
- 
+
 -void x265_pixel_avg_pp_4x4_neon (pixel* dst, intptr_t dstride, const pixel* src0, intptr_t sstride0, const pixel* src1, intptr_t sstride1, int);
 -void x265_pixel_avg_pp_4x8_neon (pixel* dst, intptr_t dstride, const pixel* src0, intptr_t sstride0, const pixel* src1, intptr_t sstride1, int);
 -void x265_pixel_avg_pp_4x16_neon (pixel* dst, intptr_t dstride, const pixel* src0, intptr_t sstride0, const pixel* src1, intptr_t sstride1, int);
@@ -5641,7 +5641,7 @@ index 179c2f4ec..74e75cf96 100644
 +                                  intptr_t sstride1, int);
 +void x265_pixel_avg_pp_64x64_neon(pixel *dst, intptr_t dstride, const pixel *src0, intptr_t sstride0, const pixel *src1,
 +                                  intptr_t sstride1, int);
- 
+
 -void x265_sad_x3_4x4_neon(const pixel* fenc, const pixel* fref0, const pixel* fref1, const pixel* fref2, intptr_t frefstride, int32_t* res);
 -void x265_sad_x3_4x8_neon(const pixel* fenc, const pixel* fref0, const pixel* fref1, const pixel* fref2, intptr_t frefstride, int32_t* res);
 -void x265_sad_x3_4x16_neon(const pixel* fenc, const pixel* fref0, const pixel* fref1, const pixel* fref2, intptr_t frefstride, int32_t* res);
@@ -5717,7 +5717,7 @@ index 179c2f4ec..74e75cf96 100644
 +                            intptr_t frefstride, int32_t *res);
 +void x265_sad_x3_64x64_neon(const pixel *fenc, const pixel *fref0, const pixel *fref1, const pixel *fref2,
 +                            intptr_t frefstride, int32_t *res);
- 
+
 -void x265_sad_x4_4x4_neon(const pixel* fenc, const pixel* fref0, const pixel* fref1, const pixel* fref2, const pixel* fref3, intptr_t frefstride, int32_t* res);
 -void x265_sad_x4_4x8_neon(const pixel* fenc, const pixel* fref0, const pixel* fref1, const pixel* fref2, const pixel* fref3, intptr_t frefstride, int32_t* res);
 -void x265_sad_x4_4x16_neon(const pixel* fenc, const pixel* fref0, const pixel* fref1, const pixel* fref2, const pixel* fref3, intptr_t frefstride, int32_t* res);
@@ -5793,12 +5793,12 @@ index 179c2f4ec..74e75cf96 100644
 +                            const pixel *fref3, intptr_t frefstride, int32_t *res);
 +void x265_sad_x4_64x64_neon(const pixel *fenc, const pixel *fref0, const pixel *fref1, const pixel *fref2,
 +                            const pixel *fref3, intptr_t frefstride, int32_t *res);
- 
+
 -#endif // ifndef X265_I386_PIXEL_AARCH64_H
 +#endif // ifndef x265_AARCH64_PIXEL_H
-diff --git a/source/common/cpu.cpp b/source/common/cpu.cpp
+diff -Naur ./source/common/cpu.cpp b/source/common/cpu.cpp
 index 2eacfe4a9..ce428c929 100644
---- a/source/common/cpu.cpp
+--- ./source/common/cpu.cpp
 +++ b/source/common/cpu.cpp
 @@ -7,6 +7,8 @@
   *          Steve Borho <steve@borho.org>
@@ -5812,13 +5812,13 @@ index 2eacfe4a9..ce428c929 100644
 @@ -105,6 +107,9 @@ const cpu_name_t cpu_names[] =
      { "NEON",            X265_CPU_NEON },
      { "FastNeonMRC",     X265_CPU_FAST_NEON_MRC },
- 
+
 +#elif X265_ARCH_ARM64
 +    { "NEON",            X265_CPU_NEON },
 +
  #elif X265_ARCH_POWER8
      { "Altivec",         X265_CPU_ALTIVEC },
- 
+
 @@ -369,12 +374,23 @@ uint32_t cpu_detect(bool benableavx512)
      flags |= PFX(cpu_fast_neon_mrc_test)() ? X265_CPU_FAST_NEON_MRC : 0;
  #endif
@@ -5828,7 +5828,7 @@ index 2eacfe4a9..ce428c929 100644
  #endif // if HAVE_ARMV6
      return flags;
  }
- 
+
 +#elif X265_ARCH_ARM64
 +
 +uint32_t cpu_detect(bool benableavx512)
@@ -5838,19 +5838,19 @@ index 2eacfe4a9..ce428c929 100644
 +    #if HAVE_NEON
 +         flags |= X265_CPU_NEON;
 +    #endif
-+        
++
 +    return flags;
 +}
 +
  #elif X265_ARCH_POWER8
- 
+
  uint32_t cpu_detect(bool benableavx512)
-diff --git a/source/test/CMakeLists.txt b/source/test/CMakeLists.txt
+diff -Naur ./source/test/CMakeLists.txt b/source/test/CMakeLists.txt
 index 9abaf31ff..260195f53 100644
---- a/source/test/CMakeLists.txt
+--- ./source/test/CMakeLists.txt
 +++ b/source/test/CMakeLists.txt
 @@ -23,15 +23,13 @@ endif(X86)
- 
+
  # add ARM assembly files
  if(ARM OR CROSS_COMPILE_ARM)
 -    if(NOT ARM64)
@@ -5870,24 +5870,24 @@ index 9abaf31ff..260195f53 100644
 +        ARGS ${NASM_FLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/checkasm-arm.S -o checkasm-arm.obj
 +        DEPENDS checkasm-arm.S)
  endif(ARM OR CROSS_COMPILE_ARM)
- 
+
  # add PowerPC assembly files
-diff --git a/source/test/testbench.cpp b/source/test/testbench.cpp
+diff -Naur ./source/test/testbench.cpp b/source/test/testbench.cpp
 index 8db8c0c25..97d3119b4 100644
---- a/source/test/testbench.cpp
+--- ./source/test/testbench.cpp
 +++ b/source/test/testbench.cpp
 @@ -208,7 +208,6 @@ int main(int argc, char *argv[])
- 
+
          EncoderPrimitives asmprim;
          memset(&asmprim, 0, sizeof(asmprim));
 -        setupAssemblyPrimitives(asmprim, test_arch[i].flag);
- 
+
  #if X265_ARCH_ARM64
          /* Temporary workaround because luma_vsp assembly primitive has not been completed
 @@ -217,6 +216,7 @@ int main(int argc, char *argv[])
          setupAliasCPrimitives(cprim, asmprim, test_arch[i].flag);
  #endif
- 
+
 +        setupAssemblyPrimitives(asmprim, test_arch[i].flag);
          setupAliasPrimitives(asmprim);
          memcpy(&primitives, &asmprim, sizeof(EncoderPrimitives));
@@ -5897,21 +5897,21 @@ index 8db8c0c25..97d3119b4 100644
      setupInstrinsicPrimitives(optprim, cpuid);
  #endif
 -    setupAssemblyPrimitives(optprim, cpuid);
- 
+
  #if X265_ARCH_ARM64
      /* Temporary workaround because luma_vsp assembly primitive has not been completed
 @@ -248,6 +247,8 @@ int main(int argc, char *argv[])
      setupAliasCPrimitives(cprim, optprim, cpuid);
  #endif
- 
+
 +    setupAssemblyPrimitives(optprim, cpuid);
 +
      /* Note that we do not setup aliases for performance tests, that would be
       * redundant. The testbench only verifies they are correctly aliased */
- 
-diff --git a/source/test/testharness.h b/source/test/testharness.h
+
+diff -Naur ./source/test/testharness.h b/source/test/testharness.h
 index 088343b51..c03d7c2f5 100644
---- a/source/test/testharness.h
+--- ./source/test/testharness.h
 +++ b/source/test/testharness.h
 @@ -82,15 +82,13 @@ static inline uint32_t __rdtsc(void)
  #if X265_ARCH_X86
@@ -5922,7 +5922,7 @@ index 088343b51..c03d7c2f5 100644
 -#else
      // TOD-DO: verify following inline asm to get cpu Timestamp Counter for ARM arch
      // asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(a));
- 
+
      // TO-DO: replace clock() function with appropriate ARM cpu instructions
      a = clock();
 -#endif
@@ -5939,7 +5939,6 @@ index 088343b51..c03d7c2f5 100644
 +#elif (X265_ARCH_ARM == 0 && X265_ARCH_ARM64 == 0)
  #define PFX(stack_pagealign)(func, align) func()
  #endif
- 
--- 
-2.42.0
 
+--
+2.42.0
