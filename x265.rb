@@ -8,7 +8,7 @@ class X265 < Formula
 
   stable do
     patch do
-      url "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/x265_git-4bf31dc.patch"
+      url "https://github.com/BEAR10591/homebrew-tap/blob/main/patch/apple_arm64_x265.patch"
       sha256 "36046718b8fee5f6bf2348c6f6c7d2a5c15be4ce532067e0fc75d99b10a27618"
     end
   end
