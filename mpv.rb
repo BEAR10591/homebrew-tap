@@ -24,9 +24,10 @@ class Mpv < Formula
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
-  depends_on "bear10591/tap/libplacebo"
+  depends_on "libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
+  depends_on "molten-vk"
   depends_on "mujs"
   depends_on "uchardet"
   depends_on "vapoursynth"
@@ -57,7 +58,6 @@ class Mpv < Formula
       -Dlibplacebo=enabled
       -Duchardet=enabled
       -Davfoundation=enabled
-      -Dcoreaudio=enabled
       -Dvulkan=enabled
       --sysconfdir=#{pkgetc}
       --datadir=#{pkgshare}
@@ -79,16 +79,19 @@ class Mpv < Formula
       end
     end
 
-    bash_completion.install "etc/mpv.bash-completion" => "mpv"
-    zsh_completion.install "etc/_mpv.zsh" => "_mpv"
+    if MacOS.version >= :big_sur
+      bash_completion.install "etc/mpv.bash-completion" => "mpv"
+      zsh_completion.install "etc/_mpv.zsh" => "_mpv"
+    end
 
     # Build, Fix, and Codesign App Bundle
-    system "python3.11", "TOOLS/osxbundle.py", "build/mpv", "--skip-deps"
-    bindir = "build/mpv.app/Contents/MacOS/"
-    rm   bindir + "mpv-bundle"
-    mv   bindir + "mpv", bindir + "mpv-bundle"
-    ln_s "mpv-bundle", bindir + "mpv"
-    system "codesign", "--deep", "-fs", "-", "build/mpv.app"
+    system "python3.12", "TOOLS/osxbundle.py", "build/mpv", "--skip-deps"
+    if MacOS.version < :mojave || !build.head?
+      bindir = "build/mpv.app/Contents/MacOS/"
+      rm_f bindir + "mpv-bundle"
+      cp   bindir + "mpv", bindir + "mpv-bundle"
+      system "codesign", "--deep", "-fs", "-", "build/mpv.app"
+    end
     prefix.install "build/mpv.app"
   end
 

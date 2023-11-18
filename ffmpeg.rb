@@ -25,7 +25,7 @@ class Ffmpeg < Formula
   depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
-  depends_on "deus0ww/tap/libplacebo"
+  depends_on "libplacebo"
   depends_on "librist"
   depends_on "libsoxr"
   depends_on "libvidstab"
@@ -72,6 +72,14 @@ class Ffmpeg < Formula
   patch do
     url "https://gitlab.archlinux.org/archlinux/packaging/packages/ffmpeg/-/raw/5670ccd86d3b816f49ebc18cab878125eca2f81f/add-av_stream_get_first_dts-for-chromium.patch"
     sha256 "57e26caced5a1382cb639235f9555fc50e45e7bf8333f7c9ae3d49b3241d3f77"
+  end
+
+  # WebVTT decoding fix from yt-dlp
+  # https://github.com/yt-dlp/yt-dlp/issues/4127
+  # https://trac.ffmpeg.org/ticket/8684
+  patch do
+    url "https://github.com/yt-dlp/FFmpeg-Builds/raw/master/patches/ffmpeg/master/0001-avformat-webvttdec-Ignore-REGION-and-STYLE-chunks.patch"
+    sha256 "47d4b62b19642e13d9d7d1a53c0a689863181779854ad9260fdee7b9a568befa"
   end
 
   def install
@@ -132,7 +140,7 @@ class Ffmpeg < Formula
     ]
 
     # Needs corefoundation, coremedia, corevideo
-    args += %w[--enable-videotoolbox --enable-audiotoolbox] if OS.mac?
+    args += %w[--enable-opencl --enable-videotoolbox --enable-audiotoolbox] if OS.mac?
     args << "--enable-neon" if Hardware::CPU.arm?
 
     system "./configure", *args
