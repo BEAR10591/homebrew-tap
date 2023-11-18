@@ -13,10 +13,10 @@ class Mpv < Formula
   end
 
   # ao: add a new ao "avfoundation" to support spatial audio in macOS
-  patch do
-    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11955.patch"
-    sha256 "bb3a4a5cd6e6803e856b6dd513f10f68ae18fdf427bc60ff62c1236e9b81adec"
-  end
+  #patch do
+    #url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11955.patch"
+    #sha256 "bb3a4a5cd6e6803e856b6dd513f10f68ae18fdf427bc60ff62c1236e9b81adec"
+  #end
 
   depends_on "docutils" => :build
   depends_on "meson" => :build
