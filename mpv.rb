@@ -12,12 +12,6 @@ class Mpv < Formula
     sha256 "f903867b3342abab28ceb11bd447aefd42ef3cefd1f6f0cd03c0f177436e854f"
   end
 
-  # ao: add a new ao "avfoundation" to support spatial audio in macOS
-  #patch do
-    #url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/11955.patch"
-    #sha256 "bb3a4a5cd6e6803e856b6dd513f10f68ae18fdf427bc60ff62c1236e9b81adec"
-  #end
-
   depends_on "docutils" => :build
   depends_on "meson" => :build
   depends_on "pkg-config" => [:build, :test]
@@ -57,10 +51,7 @@ class Mpv < Formula
       -Dlibmpv=false
       -Dlua=luajit
       -Dlibarchive=enabled
-      -Dlibplacebo=enabled
       -Duchardet=enabled
-      -Davfoundation=enabled
-      -Dvulkan=enabled
       --sysconfdir=#{pkgetc}
       --datadir=#{pkgshare}
       --mandir=#{man}
