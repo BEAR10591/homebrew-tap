@@ -78,6 +78,8 @@ class Mpv < Formula
     # Build, Fix, and Codesign App Bundle
     system "python3.12", "TOOLS/osxbundle.py", "build/mpv", "--skip-deps"
     prefix.install "build/mpv.app"
+    # Move to /Applications
+    system "mv", "/opt/homebrew/opt/mpv/mpv.app", "/Applications"
   end
 
   test do
