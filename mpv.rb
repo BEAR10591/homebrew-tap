@@ -77,12 +77,6 @@ class Mpv < Formula
 
     # Build, Fix, and Codesign App Bundle
     system "python3.12", "TOOLS/osxbundle.py", "build/mpv", "--skip-deps"
-    if MacOS.version < :mojave || !build.head?
-      bindir = "build/mpv.app/Contents/MacOS/"
-      rm_f bindir + "mpv-bundle"
-      cp   bindir + "mpv", bindir + "mpv-bundle"
-      system "codesign", "--deep", "-fs", "-", "build/mpv.app"
-    end
     prefix.install "build/mpv.app"
   end
 
