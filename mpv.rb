@@ -6,10 +6,10 @@ class Mpv < Formula
   license :cannot_represent
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  #patch do # sd_lavc: support rendering bitmap subtitles with libaribcaption
-    #url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_libaribcaption_PR11648.patch"
-    #sha256 "f903867b3342abab28ceb11bd447aefd42ef3cefd1f6f0cd03c0f177436e854f"
-  #end
+  patch do # sd_lavc: support rendering bitmap subtitles with libaribcaption
+    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_libaribcaption_PR11648.patch"
+    sha256 "f903867b3342abab28ceb11bd447aefd42ef3cefd1f6f0cd03c0f177436e854f"
+  end
 
   depends_on "docutils" => :build
   depends_on "meson" => :build
