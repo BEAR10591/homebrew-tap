@@ -78,6 +78,9 @@ class Mpv < Formula
     # Build, Fix, and Codesign App Bundle
     system "python3.12", "TOOLS/osxbundle.py", "build/mpv", "--skip-deps"
     prefix.install "build/mpv.app"
+
+     # Add to Dock
+     system "dockutil", "--add", "#{prefix}/mpv.app", "--replacing", "mpv", "--allhomes" if build.with? "dockutil"
   end
 
   test do
@@ -86,8 +89,5 @@ class Mpv < Formula
 
     # Make sure `pkg-config` can parse `mpv.pc` after the `inreplace`.
     system "pkg-config", "mpv"
-
-    # Move to /Applications
-    system "mv", "/opt/homebrew/opt/mpv/mpv.app", "/Applications"
   end
 end
