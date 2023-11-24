@@ -80,7 +80,7 @@ class Mpv < Formula
     prefix.install "build/mpv.app"
 
     # Move to /Applications
-    system "mv", "#{prefix}/mpv.app", "/Applications"
+    system "sudo", "mv", "#{prefix}/mpv.app", "/Applications"
   end
 
   test do
