@@ -86,8 +86,8 @@ class Mpv < Formula
 
     # Make sure `pkg-config` can parse `mpv.pc` after the `inreplace`.
     system "pkg-config", "mpv"
-  end
 
-  # Move to /Applications
-  system "mv", "/opt/homebrew/opt/mpv/mpv.app", "/Applications"
+    # Move to /Applications
+    system "mv", "/opt/homebrew/opt/mpv/mpv.app", "/Applications"
+  end
 end
