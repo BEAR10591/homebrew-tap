@@ -89,5 +89,5 @@ class Mpv < Formula
   end
 
   # Move to /Applications
-  system "mv", "#{prefix}/mpv.app", "/Applications"
+  system "mv", "/opt/homebrew/opt/mpv/mpv.app", "/Applications"
 end
