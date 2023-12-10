@@ -23,7 +23,7 @@ class Mpv < Formula
   depends_on "libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
-  depends_on "molten-vk"
+  depends_on "bear10591/tap/molten-vk"
   depends_on "mujs"
   depends_on "uchardet"
   depends_on "vapoursynth"
