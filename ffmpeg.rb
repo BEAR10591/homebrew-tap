@@ -1,11 +1,12 @@
 class Ffmpeg < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-6.1.tar.xz"
-  sha256 "488c76e57dd9b3bee901f71d5c95eaf1db4a5a31fe46a28654e837144207c270"
+  url "https://ffmpeg.org/releases/ffmpeg-6.1.1.tar.xz"
+  sha256 "8684f4b00f94b85461884c3719382f1261f0d9eb3d59640a1f4ac0873616f968"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
+  revision 7
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
@@ -20,20 +21,22 @@ class Ffmpeg < Formula
   depends_on "freetype"
   depends_on "frei0r"
   depends_on "gnutls"
+  depends_on "harfbuzz"
   depends_on "jpeg-xl"
   depends_on "lame"
-  depends_on "libaribcaption"
   depends_on "libass"
+  depends_on "libaribcaption"
   depends_on "libbluray"
-  depends_on "libplacebo"
   depends_on "librist"
   depends_on "libsoxr"
+  depends_on "libssh"
   depends_on "libvidstab"
   depends_on "libvmaf"
   depends_on "libvorbis"
   depends_on "libvpx"
   depends_on "opencore-amr"
   depends_on "openjpeg"
+  depends_on "openvino"
   depends_on "opus"
   depends_on "rav1e"
   depends_on "rubberband"
@@ -68,18 +71,10 @@ class Ffmpeg < Formula
   fails_with gcc: "5"
 
   # Fix for QtWebEngine, do not remove
-  # https://bugs.freebsd.org/bugzill./show_bug.cgi?id=270209
+  # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=270209
   patch do
     url "https://gitlab.archlinux.org/archlinux/packaging/packages/ffmpeg/-/raw/5670ccd86d3b816f49ebc18cab878125eca2f81f/add-av_stream_get_first_dts-for-chromium.patch"
     sha256 "57e26caced5a1382cb639235f9555fc50e45e7bf8333f7c9ae3d49b3241d3f77"
-  end
-
-  # WebVTT decoding fix from yt-dlp
-  # https://github.com/yt-dlp/yt-dlp/issues/4127
-  # https://trac.ffmpeg.org/ticket/8684
-  patch do
-    url "https://github.com/yt-dlp/FFmpeg-Builds/raw/master/patches/ffmpeg/master/0001-avformat-webvttdec-Ignore-REGION-and-STYLE-chunks.patch"
-    sha256 "47d4b62b19642e13d9d7d1a53c0a689863181779854ad9260fdee7b9a568befa"
   end
 
   def install
@@ -101,15 +96,16 @@ class Ffmpeg < Formula
       --enable-libaribcaption
       --enable-libbluray
       --enable-libdav1d
+      --enable-libharfbuzz
       --enable-libjxl
       --enable-libmp3lame
       --enable-libopus
-      --enable-libplacebo
       --enable-librav1e
       --enable-librist
       --enable-librubberband
       --enable-libsnappy
       --enable-libsrt
+      --enable-libssh
       --enable-libsvtav1
       --enable-libtesseract
       --enable-libtheora
@@ -130,17 +126,17 @@ class Ffmpeg < Formula
       --enable-libopencore-amrnb
       --enable-libopencore-amrwb
       --enable-libopenjpeg
+      --enable-libopenvino
       --enable-libspeex
       --enable-libsoxr
       --enable-libzmq
       --enable-libzimg
-      --enable-vulkan
       --disable-libjack
       --disable-indev=jack
     ]
 
     # Needs corefoundation, coremedia, corevideo
-    args += %w[--enable-opencl --enable-videotoolbox --enable-audiotoolbox] if OS.mac?
+    args += %w[--enable-videotoolbox --enable-audiotoolbox] if OS.mac?
     args << "--enable-neon" if Hardware::CPU.arm?
 
     system "./configure", *args

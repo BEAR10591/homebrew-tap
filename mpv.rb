@@ -4,17 +4,17 @@ class Mpv < Formula
   url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.37.0.tar.gz"
   sha256 "1d2d4adbaf048a2fa6ee134575032c4b2dad9a7efafd5b3e69b88db935afaddf"
   license :cannot_represent
+  revision 1
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
   patch do # sd_lavc: support rendering bitmap subtitles with libaribcaption
-    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/main/patch/mpv_libaribcaption_PR11648.patch"
-    sha256 "f903867b3342abab28ceb11bd447aefd42ef3cefd1f6f0cd03c0f177436e854f"
+    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/13752.patch"
+    sha256 "5a84dc6789a56a2e84ccf0221caaf773b2ed7e40c751923d7a4fe94f196b24aa"
   end
 
   depends_on "docutils" => :build
   depends_on "meson" => :build
   depends_on "pkg-config" => [:build, :test]
-  depends_on "python@3.12" => :build
   depends_on xcode: :build
   depends_on "bear10591/tap/ffmpeg"
   depends_on "jpeg-turbo"
