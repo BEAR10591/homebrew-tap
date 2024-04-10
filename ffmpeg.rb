@@ -1,12 +1,11 @@
 class Ffmpeg < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-6.1.1.tar.xz"
-  sha256 "8684f4b00f94b85461884c3719382f1261f0d9eb3d59640a1f4ac0873616f968"
+  url "https://ffmpeg.org/releases/ffmpeg-7.0.tar.xz"
+  sha256 "4426a94dd2c814945456600c8adfc402bee65ec14a70e8c531ec9a2cd651da7b"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
-  revision 7
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
@@ -27,6 +26,7 @@ class Ffmpeg < Formula
   depends_on "libass"
   depends_on "libaribcaption"
   depends_on "libbluray"
+  depends_on "libplacebo"
   depends_on "librist"
   depends_on "libsoxr"
   depends_on "libssh"
@@ -54,6 +54,7 @@ class Ffmpeg < Formula
   depends_on "xz"
   depends_on "zeromq"
   depends_on "zimg"
+  depends_on "molten-vk"
 
   uses_from_macos "bzip2"
   uses_from_macos "libxml2"
@@ -100,6 +101,7 @@ class Ffmpeg < Formula
       --enable-libjxl
       --enable-libmp3lame
       --enable-libopus
+      --enable-libplacebo
       --enable-librav1e
       --enable-librist
       --enable-librubberband
@@ -131,6 +133,7 @@ class Ffmpeg < Formula
       --enable-libsoxr
       --enable-libzmq
       --enable-libzimg
+      --enable-vulkan
       --disable-libjack
       --disable-indev=jack
     ]
@@ -144,10 +147,8 @@ class Ffmpeg < Formula
 
     # Build and install additional FFmpeg tools
     system "make", "alltools"
-    bin.install Dir["tools/*"].select { |f| File.executable? f }
-
-    # Fix for Non-executables that were installed to bin/
-    mv bin/"python", pkgshare/"python", force: true
+    bin.install (buildpath/"tools").children.select { |f| f.file? && f.executable? }
+    pkgshare.install buildpath/"tools/python"
   end
 
   test do
