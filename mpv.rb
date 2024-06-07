@@ -9,7 +9,7 @@ class Mpv < Formula
   stable do
     patch do # sub/sd_lavc: check decoder output type for dvb and arib
       url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/13752.patch"
-      sha256 "5a84dc6789a56a2e84ccf0221caaf773b2ed7e40c751923d7a4fe94f196b24aa"
+      sha256 "4afa43c3c41c8f95b72405677126191ce4eb9be163504bedead055a48900d0c3"
     end
   end
 
