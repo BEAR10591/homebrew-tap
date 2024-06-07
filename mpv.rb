@@ -1,15 +1,16 @@
 class Mpv < Formula
   desc "Media player based on MPlayer and mplayer2"
   homepage "https://mpv.io"
-  url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.37.0.tar.gz"
-  sha256 "1d2d4adbaf048a2fa6ee134575032c4b2dad9a7efafd5b3e69b88db935afaddf"
+  url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.38.0.tar.gz"
+  sha256 "86d9ef40b6058732f67b46d0bbda24a074fae860b3eaae05bab3145041303066"
   license :cannot_represent
-  revision 1
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  patch do # sd_lavc: support rendering bitmap subtitles with libaribcaption
-    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/13752.patch"
-    sha256 "5a84dc6789a56a2e84ccf0221caaf773b2ed7e40c751923d7a4fe94f196b24aa"
+  stable do
+    patch do # sub/sd_lavc: check decoder output type for dvb and arib
+      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/13752.patch"
+      sha256 "5a84dc6789a56a2e84ccf0221caaf773b2ed7e40c751923d7a4fe94f196b24aa"
+    end
   end
 
   depends_on "docutils" => :build
@@ -20,17 +21,28 @@ class Mpv < Formula
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
+  depends_on "libbluray"
   depends_on "libplacebo"
+  depends_on "libsamplerate"
   depends_on "little-cms2"
   depends_on "luajit"
-  depends_on "molten-vk"
   depends_on "mujs"
+  depends_on "rubberband"
   depends_on "uchardet"
   depends_on "vapoursynth"
+  depends_on "vulkan-loader"
   depends_on "yt-dlp"
+  depends_on "zimg"
+
+  uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "molten-vk"
+  end
 
   on_linux do
     depends_on "alsa-lib"
+    depends_on "pulseaudio"
   end
 
   def install
