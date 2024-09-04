@@ -10,7 +10,7 @@ EOS
   head do
     patch do # sub/sd_lavc: check decoder output type for dvb and arib
       url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/13752.patch"
-      sha256 "6a62ecccf1862526d0c76abbb53916855eb2915871bff0bcf7d72ad11bda0b80"
+      sha256 "4afa43c3c41c8f95b72405677126191ce4eb9be163504bedead055a48900d0c3"
     end
   end
 
