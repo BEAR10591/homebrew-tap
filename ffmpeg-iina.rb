@@ -1,4 +1,4 @@
-class Ffmpeg < Formula
+class FfmpegIina < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
   url "https://ffmpeg.org/releases/ffmpeg-7.0.2.tar.xz"
