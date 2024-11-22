@@ -12,8 +12,8 @@ EOS
 
   stable do
     patch do # sub/sd_lavc: check decoder output type for dvb and arib
-      url "https://github.com/mpv-player/mpv/compare/master...iina:mpv:iina-release/1.4.0.patch"
-      sha256 "7d06eecd564d5a32cbd190cf30e1122d8bb9a932ae98ff7c76a382b7589f0fd6"
+      url "https://github.com/mpv-player/mpv/compare/2348fb5e42758972532bdbdb51b08af161e0c0cf...iina:mpv:iina-release/1.4.0.patch"
+      sha256 "41b3f5ed6c4b71139825124e013eaf87c215625ca6b026f21f0c6a4a2912aca4"
     end
   end
 
