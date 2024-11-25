@@ -13,21 +13,21 @@ EOS
   stable do
     patch do # mp_image: copy params before dovi mapping for mp_image_copy_attributes
       url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/14961.patch"
-      # sha256 "8dcd912c70030d46269eda8cab05d594a220183d324ef0c41a22b4864d568a36"
+      sha256 "8dcd912c70030d46269eda8cab05d594a220183d324ef0c41a22b4864d568a36"
     end
   end
 
   stable do
     patch do # video/mp_image: fix original param copy implementation
       url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/15210.patch"
-      # sha256 "6d4da39a9983fc3ce5d354a8a7645c415c5889def810e4b6fc4a2c30e1db5bd6"
+      sha256 "6d4da39a9983fc3ce5d354a8a7645c415c5889def810e4b6fc4a2c30e1db5bd6"
     end
   end
 
   stable do
     patch do # Use only tag name in mpv version
       url "https://github.com/iina/mpv/commit/0e2b759fcf01eb4b57960a17d7c6d9ff888e47cc.patch"
-      # sha256 "ce3d98fd83b742812922777b5c6fed782a8e324d2ab99318cdc684cb9c166bf7"
+      sha256 "ce3d98fd83b742812922777b5c6fed782a8e324d2ab99318cdc684cb9c166bf7"
     end
   end
 
