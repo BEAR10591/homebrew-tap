@@ -1,17 +1,12 @@
+# Last check with upstream: 042325cd385225e055e2ccf676abe0072cd38dcb <ffmpeg: update 6.0_2 bottle>
+# https://github.com/Homebrew/homebrew-core/blob/master/Formula/f/ffmpeg.rb
+
 class FfmpegIina < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-7.1.tar.xz"
-  sha256 "40973d44970dbc83ef302b0609f2e74982be2d85916dd2ee7472d30678a7abe6"
-  # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
-  # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
-  license "GPL-2.0-or-later"
+  url "https://ffmpeg.org/releases/ffmpeg-7.0.1.tar.xz"
+  sha256 "bce9eeb0f17ef8982390b1f37711a61b4290dc8c2a0c1a37b5857e85bfb0e4ff"
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
-
-  livecheck do
-    url "https://ffmpeg.org/download.html"
-    regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
 
   keg_only <<EOS
 it is intended to only be used for building IINA.
@@ -59,7 +54,6 @@ EOS
       --enable-ffplay
       --enable-gnutls
       --enable-gpl
-      --enable-libaribcaption
       --enable-libbluray
       --enable-libdav1d
       --enable-librubberband
@@ -70,6 +64,7 @@ EOS
       --enable-libfontconfig
       --enable-libfreetype
       --enable-frei0r
+      --enable-libaribcaption
       --enable-libass
       --enable-libspeex
       --enable-libsoxr
@@ -84,7 +79,7 @@ EOS
       --disable-programs
     ]
 
-    # Needs corefoundation, coremedia, corevideo
+
     args << "--enable-neon" if Hardware::CPU.arm?
     args << "--cc=#{ENV.cc}" if Hardware::CPU.intel?
 

@@ -1,53 +1,37 @@
+# Last check with upstream: 03fb1acf8d1c5417b8079eb68b2104a1296bc665
+# https://github.com/Homebrew/homebrew-core/blob/master/Formula/m/mpv.rb
+
 class MpvIina < Formula
-  desc "Media player based on MPlayer and mplayer2"
+desc "Media player based on MPlayer and mplayer2"
   homepage "https://mpv.io"
-  url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.39.0.tar.gz"
-  sha256 "2ca92437affb62c2b559b4419ea4785c70d023590500e8a52e95ea3ab4554683"
-  license :cannot_represent
-  head "https://github.com/mpv-player/mpv.git", branch: "master"
+  head "https://github.com/iina/mpv.git", :branch => "iina-release/1.4.0"
 
   keg_only <<EOS
 it is intended to only be used for building IINA. This formula is not recommended for daily use
 EOS
 
-  stable do
-    patch do # mp_image: copy params before dovi mapping for mp_image_copy_attributes
-      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/14961.patch"
-      sha256 "8dcd912c70030d46269eda8cab05d594a220183d324ef0c41a22b4864d568a36"
-    end
-  end
-
-  stable do
-    patch do # video/mp_image: fix original param copy implementation
-      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/15210.patch"
-      sha256 "6d4da39a9983fc3ce5d354a8a7645c415c5889def810e4b6fc4a2c30e1db5bd6"
-    end
-  end
-
-  stable do
-    patch do # Use only tag name in mpv version
-      url "https://github.com/iina/mpv/commit/0e2b759fcf01eb4b57960a17d7c6d9ff888e47cc.patch"
-      sha256 "ce3d98fd83b742812922777b5c6fed782a8e324d2ab99318cdc684cb9c166bf7"
-    end
+  patch do # sub/sd_lavc: check decoder output type for dvb and arib
+    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/13752.patch"
+    sha256 "4afa43c3c41c8f95b72405677126191ce4eb9be163504bedead055a48900d0c3"
   end
 
   depends_on "docutils" => :build
   depends_on "meson" => :build
-  depends_on "ninja" => :build
   depends_on "pkg-config" => [:build, :test]
   depends_on xcode: :build
+
   depends_on "bear10591/tap/ffmpeg-iina"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
   depends_on "libass"
-  depends_on "libbluray"
   depends_on "libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
-  depends_on "rubberband"
+  depends_on "libbluray"
+  depends_on "libsamplerate"
   depends_on "vulkan-loader"
   depends_on "zimg"
-  # depends_on "molten-vk"
+ # depends_on "molten-vk"
 
   uses_from_macos "zlib"
 
@@ -63,7 +47,7 @@ EOS
     ENV["LC_ALL"] = "C"
 
     # force meson find ninja from homebrew
-    ENV["NINJA"] = which("ninja")
+    ENV["NINJA"] = Formula["ninja"].opt_bin/"ninja"
 
     # libarchive is keg-only
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["libarchive"].opt_lib/"pkgconfig"
