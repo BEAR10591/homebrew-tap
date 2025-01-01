@@ -107,9 +107,7 @@ class Mpv < Formula
     prefix.install "build/mpv.app"
 
     # Add to Dock
-    if build.with? "dockutil"
-      system "dockutil", "--add", "#{prefix}/mpv.app", "--label", "mpv", "--replacing", "mpv", "--allhomes"
-    end
+    system "dockutil", "--add", "#{prefix}/mpv.app", "--label", "mpv", "--replacing", "mpv", "--allhomes"
   end
 
   test do
