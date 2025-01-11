@@ -4,10 +4,10 @@ class Mpv < Formula
   url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.39.0.tar.gz"
   sha256 "2ca92437affb62c2b559b4419ea4785c70d023590500e8a52e95ea3ab4554683"
   license :cannot_represent
+  revision 1
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
   depends_on "docutils" => :build
-  depends_on "dockutil" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkgconf" => [:build, :test]
@@ -32,6 +32,7 @@ class Mpv < Formula
 
   on_macos do
     depends_on "molten-vk"
+    depends_on "dockutil"
   end
 
   on_linux do
@@ -107,7 +108,9 @@ class Mpv < Formula
     prefix.install "build/mpv.app"
 
     # Add to Dock
-    system "dockutil", "--add", "#{prefix}/mpv.app", "--label", "mpv", "--replacing", "mpv", "--allhomes"
+    if build.with? "dockutil"
+      system "dockutil", "--add", "#{prefix}/mpv.app", "--label", "mpv", "--replacing", "mpv", "--allhomes"
+    end
   end
 
   test do
