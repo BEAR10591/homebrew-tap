@@ -72,7 +72,6 @@ class Mkvtoolnix < Formula
                           *std_configure_args
     system "rake", "-j#{ENV.make_jobs}"
     system "rake", "install"
-    system "./packaging/macos/build.sh"
   end
 
   test do
