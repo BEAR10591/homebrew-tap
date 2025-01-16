@@ -7,7 +7,7 @@ desc "Media player based on MPlayer and mplayer2"
   head "https://github.com/iina/mpv.git", :branch => "iina-release/1.4.0"
 
   keg_only <<EOS
-it is intended to only be used for building IINA. This formula is not recommended for daily use
+it is intended to only be used for building IINA. This formula is not recommended for daily use.
 EOS
 
   patch do # sub/sd_lavc: check decoder output type for dvb and arib
