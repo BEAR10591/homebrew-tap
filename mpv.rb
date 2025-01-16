@@ -32,7 +32,7 @@ class Mpv < Formula
 
   on_macos do
     depends_on "molten-vk"
-    depends_on "dockutil" => :build
+    depends_on "dockutil" => :recommended
   end
 
   on_linux do

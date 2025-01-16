@@ -5,6 +5,7 @@ class Mkvtoolnix < Formula
   mirror "https://fossies.org/linux/misc/mkvtoolnix-89.0.tar.xz"
   sha256 "6127b694b088e53270a946c178b6816da756200bdf672abdf65cfe0b50b260b2"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "https://mkvtoolnix.download/sources/"
@@ -64,7 +65,8 @@ class Mkvtoolnix < Formula
     extra_libs.chop!
 
     system "./autogen.sh" if build.head?
-    system "./configure", "--with-boost=#{Formula["boost"].opt_prefix}",
+    system "./configure", "--disable-debug",
+                          "--with-boost=#{Formula["boost"].opt_prefix}",
                           "--with-docbook-xsl-root=#{Formula["docbook-xsl"].opt_prefix}/docbook-xsl",
                           "--with-extra-includes=#{extra_includes}",
                           "--with-extra-libs=#{extra_libs}",
