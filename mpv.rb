@@ -7,6 +7,11 @@ class Mpv < Formula
   revision 1
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
+  patch do
+    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/mpv-app-category.patch"
+    sha256 "5b8907575b0f377ef5e621530bc27f56b70e1ba8460f800dc22e349acc788605"
+  end
+
   depends_on "docutils" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
@@ -32,7 +37,6 @@ class Mpv < Formula
 
   on_macos do
     depends_on "molten-vk"
-    depends_on "dockutil" => :recommended
   end
 
   on_linux do
@@ -106,11 +110,6 @@ class Mpv < Formula
     # Build, Fix, and Codesign App Bundle
     system "python3.13", "TOOLS/osxbundle.py", "build/mpv", "--skip-deps"
     prefix.install "build/mpv.app"
-
-    # Add to Dock
-    if build.with? "dockutil"
-      system "dockutil", "--add", "#{prefix}/mpv.app", "--label", "mpv", "--replacing", "mpv", "--allhomes"
-    end
   end
 
   test do
