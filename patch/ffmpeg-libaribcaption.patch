@@ -39,7 +39,7 @@ index 0b67d41..90693b4 100644
 +      OFFSET(replace_msz_glyph), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, SD },
      {"canvas_size", "set input video size (WxH or abbreviation) [bitmap]",
 -      OFFSET(canvas_width), AV_OPT_TYPE_IMAGE_SIZE, { .str = NULL }, 0, INT_MAX, SD },
-+      OFFSET(canvas_width), AV_OPT_TYPE_IMAGE_SIZE, { .str = 3840x2160 }, 0, INT_MAX, SD },
++      OFFSET(canvas_width), AV_OPT_TYPE_IMAGE_SIZE, { .str = "3840x2160" }, 0, INT_MAX, SD },
      { NULL }
  };
  
