@@ -4,7 +4,7 @@ class Mpv < Formula
   url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.39.0.tar.gz"
   sha256 "2ca92437affb62c2b559b4419ea4785c70d023590500e8a52e95ea3ab4554683"
   license :cannot_represent
-  revision 3
+  revision 4
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
   patch do
@@ -92,8 +92,6 @@ class Mpv < Formula
     system "meson", "setup", "build", *args, *std_meson_args
     system "meson", "compile", "-C", "build", "--verbose"
     system "meson", "install", "-C", "build"
-    system "meson", "compile", "-C", "build", "macos-bundle"
-    system "tar", "-czvf", "mpv.tar.gz", "-C", "build", "mpv.app"
 
     if OS.mac?
       # `pkg-config --libs mpv` includes libarchive, but that package is
@@ -110,8 +108,8 @@ class Mpv < Formula
     zsh_completion.install "etc/_mpv.zsh" => "_mpv"
 
     # Build, Fix, and Codesign App Bundle
-    # system "python3.13", "TOOLS/osxbundle.py", "build/mpv", "--skip-deps"
-    # prefix.install "build/mpv.app"
+    system "python3.13", "TOOLS/osxbundle.py", "build/mpv"
+    prefix.install "build/mpv.app"
   end
 
   test do
