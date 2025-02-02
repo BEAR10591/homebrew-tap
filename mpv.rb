@@ -108,7 +108,6 @@ class Mpv < Formula
     zsh_completion.install "etc/_mpv.zsh" => "_mpv"
 
     # Build, Fix, and Codesign App Bundle
-    # system "python3.13", "TOOLS/osxbundle.py", "build/mpv"
     system "meson", "compile", "-C", "build", "macos-bundle"
     prefix.install "build/mpv.app"
   end
