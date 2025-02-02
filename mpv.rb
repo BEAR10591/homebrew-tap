@@ -4,7 +4,7 @@ class Mpv < Formula
   url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.39.0.tar.gz"
   sha256 "2ca92437affb62c2b559b4419ea4785c70d023590500e8a52e95ea3ab4554683"
   license :cannot_represent
-  revision 4
+  revision 5
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
   patch do
@@ -108,7 +108,8 @@ class Mpv < Formula
     zsh_completion.install "etc/_mpv.zsh" => "_mpv"
 
     # Build, Fix, and Codesign App Bundle
-    system "python3.13", "TOOLS/osxbundle.py", "build/mpv"
+    # system "python3.13", "TOOLS/osxbundle.py", "build/mpv"
+    system "meson", "compile", "-C", "build", "macos-bundle"
     prefix.install "build/mpv.app"
   end
 
