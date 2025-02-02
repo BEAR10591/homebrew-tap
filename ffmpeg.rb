@@ -4,7 +4,7 @@ class Ffmpeg < Formula
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
-  revision 4
+  revision 5
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   stable do
@@ -16,6 +16,11 @@ class Ffmpeg < Formula
       url "https://github.com/FFmpeg/FFmpeg/commit/099f88b8641dfc299f3896d17d9addc5b9ae7799.patch?full_index=1"
       sha256 "43677660210523f0eb6db93c4ac9c7943c959116951a5859e6f14568b4392a59"
     end
+  end
+
+  patch do # Change libaribcaption options.
+    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/ffmpeg-libaribcaption.patch"
+    sha256 "8e27573cb7e486fda54c4a10e529e6874ebf60b81b4e733c8c45895404f533d2"
   end
 
   livecheck do
