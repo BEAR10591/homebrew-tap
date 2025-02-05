@@ -5,7 +5,7 @@ class Mkvtoolnix < Formula
   mirror "https://fossies.org/linux/misc/mkvtoolnix-89.0.tar.xz"
   sha256 "6127b694b088e53270a946c178b6816da756200bdf672abdf65cfe0b50b260b2"
   license "GPL-2.0-or-later"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://mkvtoolnix.download/sources/"
@@ -72,6 +72,7 @@ class Mkvtoolnix < Formula
                           *std_configure_args
     system "rake", "-j#{ENV.make_jobs}"
     system "rake", "install"
+    system "./packaging/macos/build.sh"
   end
 
   test do
