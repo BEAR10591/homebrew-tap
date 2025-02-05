@@ -40,7 +40,7 @@ class Ffmpeg < Formula
   depends_on "jpeg-xl"
   depends_on "lame"
   depends_on "libaribcaption"
-  depends_on "libass"
+  depends_on "bear10591/tap/libass"
   depends_on "libbluray"
   depends_on "librist"
   depends_on "libsoxr"
