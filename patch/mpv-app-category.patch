@@ -1,0 +1,13 @@
+diff --git a/TOOLS/osxbundle/mpv.app/Contents/Info.plist b/TOOLS/osxbundle/mpv.app/Contents/Info.plist
+index f94bebf..3edf944 100644
+--- a/TOOLS/osxbundle/mpv.app/Contents/Info.plist
++++ b/TOOLS/osxbundle/mpv.app/Contents/Info.plist
+@@ -133,7 +133,7 @@
+     <key>NSHighResolutionCapable</key>
+     <true/>
+     <key>LSApplicationCategoryType</key>
+-    <string>public.app-category.games</string>
++    <string>public.app-category.video</string>
+     <key>LSEnvironment</key>
+     <dict>
+       <key>MallocNanoZone</key>
