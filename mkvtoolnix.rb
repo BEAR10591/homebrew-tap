@@ -5,20 +5,16 @@ class Mkvtoolnix < Formula
   mirror "https://fossies.org/linux/misc/mkvtoolnix-89.0.tar.xz"
   sha256 "6127b694b088e53270a946c178b6816da756200bdf672abdf65cfe0b50b260b2"
   license "GPL-2.0-or-later"
-  revision 3
+  revision 4
 
   livecheck do
     url "https://mkvtoolnix.download/sources/"
     regex(/href=.*?mkvtoolnix[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  head do
-    url "https://gitlab.com/mbunkus/mkvtoolnix.git", branch: "main"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
   depends_on "docbook-xsl" => :build
   depends_on "gettext" => :build
   depends_on "nlohmann-json" => :build
