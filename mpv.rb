@@ -14,7 +14,7 @@ class Mpv < Formula
 
   patch do
     url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/mpv-console.patch"
-    sha256sum "10d630cbebec16a0093ef1a898d23f4e554f183eabf1a51ca8751a49a7b15e36"
+    sha256 "10d630cbebec16a0093ef1a898d23f4e554f183eabf1a51ca8751a49a7b15e36"
   end
 
   depends_on "docutils" => :build
