@@ -20,7 +20,7 @@ class Mpv < Formula
   depends_on "bear10591/tap/ffmpeg"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
-  depends_on "bear10591/tap/libass"
+  depends_on "libass"
   depends_on "libbluray"
   depends_on "libdvdnav"
   depends_on "libplacebo"
