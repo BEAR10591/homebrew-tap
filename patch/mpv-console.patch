@@ -1,13 +1,20 @@
 diff --git a/player/lua/console.lua b/player/lua/console.lua
-index 170f41b..f0f34b9 100644
+index 170f41b..1c984ea 100644
 --- a/player/lua/console.lua
 +++ b/player/lua/console.lua
-@@ -118,7 +118,7 @@ local function get_font()
+@@ -121,13 +121,13 @@ local function get_font()
+         return
      end
  
-     if selectable_items and not searching_history then
--        return
-+        return opts.font
+-    -- Pick a better default font for Windows and macOS
++    -- Pick a better font for Windows and macOS
+     if platform == 'windows' then
+         return 'Consolas'
      end
  
-     -- Pick a better default font for Windows and macOS
+     if platform == 'darwin' then
+-        return 'Menlo'
++        return 'SF Mono'
+     end
+ 
+     return 'monospace'
