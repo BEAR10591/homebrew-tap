@@ -4,7 +4,7 @@ class Ffmpeg < Formula
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
-  revision 7
+  revision 8
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   stable do
@@ -40,8 +40,10 @@ class Ffmpeg < Formula
   depends_on "jpeg-xl"
   depends_on "lame"
   depends_on "libaribcaption"
-  depends_on "libass"
+  depends_on "bear10591/tap/libass"
   depends_on "libbluray"
+  depends_on "libdvdnav"
+  depends_on "libdvdread"
   depends_on "librist"
   depends_on "libsoxr"
   depends_on "libssh"
@@ -117,6 +119,8 @@ class Ffmpeg < Formula
       --enable-libaom
       --enable-libaribcaption
       --enable-libbluray
+      --enable-libdvdnav
+      --enable-libdvdread
       --enable-libdav1d
       --enable-libfdk-aac
       --enable-libharfbuzz

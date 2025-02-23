@@ -20,8 +20,9 @@ class Mpv < Formula
   depends_on "bear10591/tap/ffmpeg"
   depends_on "jpeg-turbo"
   depends_on "libarchive"
-  depends_on "libass"
+  depends_on "bear10591/tap/libass"
   depends_on "libbluray"
+  depends_on "libdvdnav"
   depends_on "libplacebo"
   depends_on "little-cms2"
   depends_on "luajit"
@@ -74,6 +75,7 @@ class Mpv < Formula
       -Djavascript=enabled
       -Dlibmpv=true
       -Dlua=luajit
+      -Ddvdnav=enabled
       -Dlibarchive=enabled
       -Duchardet=enabled
       -Dvulkan=enabled
@@ -107,7 +109,7 @@ class Mpv < Formula
     bash_completion.install "etc/mpv.bash-completion" => "mpv"
     zsh_completion.install "etc/_mpv.zsh" => "_mpv"
 
-    # Build, Fix, and Codesign App Bundle
+    # Build App Bundle
     system "meson", "compile", "-C", "build", "macos-bundle"
     prefix.install "build/mpv.app"
   end
