@@ -17,11 +17,6 @@ class Mpv < Formula
     sha256 "1fb3559a2a99eac1ab59f96e43eb55bc76920a531386dc98be456f6954ad1e08"
   end
 
-  patch do # ao: proper end_time calulation & ao_read_frame() #14058
-    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/14058.patch"
-    sha256 "fc7624aef83df53c509f5572e272305cc9124a880c4e7601d330344c6b19b31b"
-  end
-
   depends_on "docutils" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
