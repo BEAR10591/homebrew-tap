@@ -1,7 +1,7 @@
 class Mp4fpsmod < Formula
   desc "mp4 time code editor"
   homepage "sites.google.com/site/qaacpage/"
-  lisence "public_domain"
+  license "public_domain"
   head "https://github.com/nu774/mp4fpsmod.git", branch: "master"
 
   stable do
