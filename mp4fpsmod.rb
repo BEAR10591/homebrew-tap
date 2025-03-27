@@ -15,7 +15,7 @@ class Mp4fpsmod < Formula
 
   def install
 	system "./bootstrap.sh"
-	system "./configure", "--prefix=#{prefix}" *args
+	system "./configure", "--prefix=#{prefix}"
 	system "make"
 	system "strip", "mp4fpsmod"
 	system "make", "install"
