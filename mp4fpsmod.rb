@@ -14,8 +14,12 @@ class Mp4fpsmod < Formula
   depends_on "automake" => :build
 
   def install
+    args = %W[
+      --prefix=#{prefix}
+    ]
+
 	system "./bootstrap.sh"
-	system "./configure", "--prefix=#{prefix}"
+	system "./configure", *args
 	system "make"
 	system "strip", "mp4fpsmod"
 	system "make", "install"
