@@ -7,7 +7,7 @@ class Mpv < Formula
   revision 1
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  patch do # Change "LSApplicationCategoryType"
+  patch do # Info.plist: change "LSApplicationCategoryType"
     url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/mpv-app-category.patch"
     sha256 "5b8907575b0f377ef5e621530bc27f56b70e1ba8460f800dc22e349acc788605"
   end
