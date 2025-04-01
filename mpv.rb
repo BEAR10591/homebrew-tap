@@ -4,16 +4,17 @@ class Mpv < Formula
   url "https://github.com/mpv-player/mpv/archive/refs/tags/v0.40.0.tar.gz"
   sha256 "10a0f4654f62140a6dd4d380dcf0bbdbdcf6e697556863dc499c296182f081a3"
   license :cannot_represent
+  revision 1
   head "https://github.com/mpv-player/mpv.git", branch: "master"
 
-  patch do # Change "LSApplicationCategoryType".
+  patch do # Change "LSApplicationCategoryType"
     url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/mpv-app-category.patch"
     sha256 "5b8907575b0f377ef5e621530bc27f56b70e1ba8460f800dc22e349acc788605"
   end
 
-  patch do # Change monospace font for console.
-    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/mpv-console.patch"
-    sha256 "1fb3559a2a99eac1ab59f96e43eb55bc76920a531386dc98be456f6954ad1e08"
+  patch do # console.lua: replace font script-opt with monospace_font #16150
+    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/16150.patch"
+    sha256 "c04941496f8aa4a8db418d4482c7437e8d38cb519804b24ea99457d3454db945"
   end
 
   depends_on "docutils" => :build
