@@ -12,9 +12,16 @@ class Mpv < Formula
     sha256 "5b8907575b0f377ef5e621530bc27f56b70e1ba8460f800dc22e349acc788605"
   end
 
-  patch do # console.lua: replace font script-opt with monospace_font #16150
-    url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/16150.patch"
-    sha256 "c04941496f8aa4a8db418d4482c7437e8d38cb519804b24ea99457d3454db945"
+  stable do
+    patch do # console.lua: use double quotes #16106
+      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/16106.patch"
+      sha256 "f1b6d032a2cbe40dc2b49f844cf58294d7b010c5f0c53ca3c68aa04b2f84dd66"
+    end
+
+    patch do # console.lua: replace font script-opt with monospace_font #16150
+      url "https://patch-diff.githubusercontent.com/raw/mpv-player/mpv/pull/16150.patch"
+      sha256 "c04941496f8aa4a8db418d4482c7437e8d38cb519804b24ea99457d3454db945"
+    end
   end
 
   depends_on "docutils" => :build
