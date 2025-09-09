@@ -1,27 +1,13 @@
 class Ffmpeg < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
+  url "https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz"
+  sha256 "b2751fccb6cc4c77708113cd78b561059b6fa904b24162fa0be2d60273d27b8e"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
   revision 1
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
-
-  stable do
-    url "https://ffmpeg.org/releases/ffmpeg-7.1.1.tar.xz"
-    sha256 "733984395e0dbbe5c046abda2dc49a5544e7e0e1e2366bba849222ae9e3a03b1"
-
-    # Backport support for recent svt-av1 (3.0.0)
-    patch do
-      url "https://github.com/FFmpeg/FFmpeg/commit/d1ed5c06e3edc5f2b5f3664c80121fa55b0baa95.patch?full_index=1"
-      sha256 "0eb23ab90c0e5904590731dd3b81c86a4127785bc2b367267d77723990fb94a2"
-    end
-  end
-
-  patch do # Change libaribcaption options.
-    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/ffmpeg-libaribcaption.patch"
-    sha256 "33c80feaf23693124192165e5fa38559de1290ceaafef1a6f011678704d26507"
-  end
 
   livecheck do
     url "https://ffmpeg.org/download.html"
@@ -31,7 +17,6 @@ class Ffmpeg < Formula
   depends_on "pkgconf" => :build
   depends_on "aom"
   depends_on "dav1d"
-  depends_on "fdk-aac"
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "frei0r"
