@@ -1,12 +1,11 @@
 class Ffmpeg < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-8.0.tar.xz"
-  sha256 "b2751fccb6cc4c77708113cd78b561059b6fa904b24162fa0be2d60273d27b8e"
+  url "https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz"
+  sha256 "05ee0b03119b45c0bdb4df654b96802e909e0a752f72e4fe3794f487229e5a41"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
-  revision 1
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
@@ -27,8 +26,6 @@ class Ffmpeg < Formula
   depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
-  depends_on "libdvdnav"
-  depends_on "libdvdread"
   depends_on "librist"
   depends_on "libsoxr"
   depends_on "libssh"
@@ -87,7 +84,7 @@ class Ffmpeg < Formula
 
   def install
     # The new linker leads to duplicate symbol issue https://github.com/homebrew-ffmpeg/homebrew-ffmpeg/issues/140
-    ENV.append "LDFLAGS", "-Wl,-ld_classic" if DevelopmentTools.clang_build_version >= 1500
+    ENV.append "LDFLAGS", "-Wl,-ld_classic" if DevelopmentTools.ld64_version.between?("1015.7", "1022.1")
 
     args = %W[
       --prefix=#{prefix}
@@ -100,14 +97,10 @@ class Ffmpeg < Formula
       --enable-ffplay
       --enable-gnutls
       --enable-gpl
-      --enable-nonfree
       --enable-libaom
       --enable-libaribcaption
       --enable-libbluray
-      --enable-libdvdnav
-      --enable-libdvdread
       --enable-libdav1d
-      --enable-libfdk-aac
       --enable-libharfbuzz
       --enable-libjxl
       --enable-libmp3lame
@@ -160,9 +153,14 @@ class Ffmpeg < Formula
   end
 
   test do
-    # Create an example mp4 file
+    # Create a 5 second test MP4
     mp4out = testpath/"video.mp4"
-    system bin/"ffmpeg", "-filter_complex", "testsrc=rate=1:duration=1", mp4out
-    assert_path_exists mp4out
+    system bin/"ffmpeg", "-filter_complex", "testsrc=rate=1:duration=5", mp4out
+    assert_match(/Duration: 00:00:05\.00,.*Video: h264/m, shell_output("#{bin}/ffprobe -hide_banner #{mp4out} 2>&1"))
+
+    # Re-encode it in HEVC/Matroska
+    mkvout = testpath/"video.mkv"
+    system bin/"ffmpeg", "-i", mp4out, "-c:v", "hevc", mkvout
+    assert_match(/Duration: 00:00:05\.00,.*Video: hevc/m, shell_output("#{bin}/ffprobe -hide_banner #{mkvout} 2>&1"))
   end
 end
