@@ -16,7 +16,7 @@ class Ffmpeg < Formula
 
   patch do # Change libaribcaption settings.
     url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/ffmpeg-libaribcaption.patch"
-    sha256 "5b8907575b0f377ef5e621530bc27f56b70e1ba8460f800dc22e349acc788605"
+    sha256 "33c80feaf23693124192165e5fa38559de1290ceaafef1a6f011678704d26507"
   end
 
   depends_on "pkgconf" => :build
