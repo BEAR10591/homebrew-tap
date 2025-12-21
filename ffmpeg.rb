@@ -6,6 +6,7 @@ class Ffmpeg < Formula
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
+  revision 1
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
@@ -13,9 +14,15 @@ class Ffmpeg < Formula
     regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  patch do # Change libaribcaption settings.
+    url "https://raw.githubusercontent.com/BEAR10591/homebrew-tap/refs/heads/main/patch/ffmpeg-libaribcaption.patch"
+    sha256 "5b8907575b0f377ef5e621530bc27f56b70e1ba8460f800dc22e349acc788605"
+  end
+
   depends_on "pkgconf" => :build
   depends_on "aom"
   depends_on "dav1d"
+  depends_on "fdk-aac"
   depends_on "fontconfig"
   depends_on "freetype"
   depends_on "frei0r"
@@ -89,6 +96,7 @@ class Ffmpeg < Formula
     args = %W[
       --prefix=#{prefix}
       --enable-shared
+      --enable-nonfree
       --enable-pthreads
       --enable-version3
       --cc=#{ENV.cc}
@@ -124,6 +132,7 @@ class Ffmpeg < Formula
       --enable-libxml2
       --enable-libxvid
       --enable-lzma
+      --enable-libfdk-aac
       --enable-libfontconfig
       --enable-libfreetype
       --enable-frei0r
