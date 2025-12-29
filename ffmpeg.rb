@@ -33,6 +33,7 @@ class Ffmpeg < Formula
   depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
+  depends_on "libdvdread"
   depends_on "librist"
   depends_on "libsoxr"
   depends_on "libssh"
@@ -108,6 +109,7 @@ class Ffmpeg < Formula
       --enable-libaom
       --enable-libaribcaption
       --enable-libbluray
+      --enable-libdvdread
       --enable-libdav1d
       --enable-libharfbuzz
       --enable-libjxl
