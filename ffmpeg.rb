@@ -27,6 +27,7 @@ class Ffmpeg < Formula
   depends_on "lame"
   depends_on "libass"
   depends_on "libbluray"
+  depends_on "libdvdnav"
   depends_on "libdvdread"
   depends_on "librist"
   depends_on "libsoxr"
@@ -103,6 +104,7 @@ class Ffmpeg < Formula
       --enable-libaom
       --enable-libaribcaption
       --enable-libbluray
+      --enable-libdvdnav
       --enable-libdvdread
       --enable-libdav1d
       --enable-libfdk-aac
