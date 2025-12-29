@@ -15,6 +15,7 @@ class Ffmpeg < Formula
 
   depends_on "pkgconf" => :build
   depends_on "aom"
+  depends_on "libaribcaption"
   depends_on "dav1d"
   depends_on "fdk-aac"
   depends_on "fontconfig"
@@ -24,7 +25,6 @@ class Ffmpeg < Formula
   depends_on "harfbuzz"
   depends_on "jpeg-xl"
   depends_on "lame"
-  depends_on "libaribcaption"
   depends_on "libass"
   depends_on "libbluray"
   depends_on "libdvdread"
@@ -105,6 +105,7 @@ class Ffmpeg < Formula
       --enable-libbluray
       --enable-libdvdread
       --enable-libdav1d
+      --enable-libfdk-aac
       --enable-libharfbuzz
       --enable-libjxl
       --enable-libmp3lame
@@ -128,7 +129,6 @@ class Ffmpeg < Formula
       --enable-libxml2
       --enable-libxvid
       --enable-lzma
-      --enable-libfdk-aac
       --enable-libfontconfig
       --enable-libfreetype
       --enable-frei0r
