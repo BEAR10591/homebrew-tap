@@ -7,6 +7,7 @@ class Arib2bdnxml < Formula
   head "https://github.com/BEAR10591/arib2bdnxml.git", branch: "main"
 
   depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkgconf" => :build
   depends_on "bear10591/tap/ffmpeg"
   depends_on "libpng"
