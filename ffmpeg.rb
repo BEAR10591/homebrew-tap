@@ -27,6 +27,7 @@ class Ffmpeg < Formula
   depends_on "lame"
   depends_on "libass"
   depends_on "libbluray"
+  depends_on "libdvdcss"
   depends_on "libdvdnav"
   depends_on "libdvdread"
   depends_on "librist"
@@ -104,6 +105,7 @@ class Ffmpeg < Formula
       --enable-libaom
       --enable-libaribcaption
       --enable-libbluray
+      --enable-libdvdcss
       --enable-libdvdnav
       --enable-libdvdread
       --enable-libdav1d
@@ -144,7 +146,6 @@ class Ffmpeg < Formula
       --enable-libzimg
       --disable-libjack
       --disable-indev=jack
-      --enable-muxer=vobsub
     ]
 
     # Needs corefoundation, coremedia, corevideo
