@@ -105,7 +105,6 @@ class Ffmpeg < Formula
       --enable-libaom
       --enable-libaribcaption
       --enable-libbluray
-      --enable-libdvdcss
       --enable-libdvdnav
       --enable-libdvdread
       --enable-libdav1d
