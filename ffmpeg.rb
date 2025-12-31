@@ -144,6 +144,7 @@ class Ffmpeg < Formula
       --enable-libzimg
       --disable-libjack
       --disable-indev=jack
+      --enable-muxer=vobsub
     ]
 
     # Needs corefoundation, coremedia, corevideo
