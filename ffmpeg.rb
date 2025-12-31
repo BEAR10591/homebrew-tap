@@ -27,7 +27,6 @@ class Ffmpeg < Formula
   depends_on "lame"
   depends_on "libass"
   depends_on "libbluray"
-  depends_on "libdvdcss"
   depends_on "libdvdnav"
   depends_on "libdvdread"
   depends_on "librist"
