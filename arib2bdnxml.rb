@@ -9,7 +9,7 @@ class Arib2bdnxml < Formula
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkgconf" => :build
-  depends_on "bear10591/tap/ffmpeg"
+  depends_on "bear10591/tap/ffmpeg-ursus"
   depends_on "libpng"
 
   def install
