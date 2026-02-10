@@ -91,7 +91,7 @@ class FfmpegUrsus < Formula
     depends_on "nasm" => :build
   end
 
-  fails_with :gcc, "5"
+  fails_with :gcc => "5"
 
   # Fix for QtWebEngine, do not remove
   # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=270209
