@@ -2,7 +2,9 @@
 
 [日本語](README.ja.md)
 
-This tap provides FFmpeg formulae with a full codec set (gyan.dev full equivalent) and FDK-AAC support.
+This tap provides FFmpeg formulae with a full codec set (gyan.dev full equivalent) and FDK-AAC support, plus tools for ARIB/MPEG-TS processing.
+
+Formulae are located in the [`Formula/`](Formula/) directory.
 
 ## Installation
 
@@ -18,7 +20,8 @@ brew tap bear10591/homebrew-tap
 |----------------|-------------|
 | `ffmpeg`       | Full FFmpeg build; replaces Homebrew's core `ffmpeg` when linked |
 | `ffmpeg-ursus` | Same full build as keg-only (versioned); does not override core `ffmpeg` |
-| `arib2bdnxml`  | ARIB caption to BDN XML converter |
+| `arib2bdnxml`  | Convert ARIB STD-B24 caption to BDN XML+PNG |
+| `tsreadex`     | MPEG-TS stream selector and stabilizer |
 
 ---
 

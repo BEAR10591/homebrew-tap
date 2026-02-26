@@ -6,6 +6,11 @@ class Arib2bdnxml < Formula
   license "MIT"
   head "https://github.com/BEAR10591/arib2bdnxml.git", branch: "main"
 
+  livecheck do
+    url "https://github.com/BEAR10591/arib2bdnxml/releases/latest"
+    regex(%r{href=.*?/tag/v?(\d+(?:\.\d+)+)["' >]}i)
+  end
+
   depends_on "rust" => :build
   depends_on "pkg-config" => :build
   depends_on "bear10591/tap/ffmpeg-ursus"

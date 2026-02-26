@@ -2,7 +2,9 @@
 
 [English](README.md)
 
-この tap は、フルコーデックセット（gyan.dev full 相当）と FDK-AAC を有効にした FFmpeg フォーミュラを提供します。
+この tap は、フルコーデックセット（gyan.dev full 相当）と FDK-AAC を有効にした FFmpeg フォーミュラおよび、ARIB/MPEG-TS 処理用のツールを提供します。
+
+フォーミュラは [`Formula/`](Formula/) ディレクトリにあります。
 
 ## インストール
 
@@ -18,7 +20,8 @@ brew tap bear10591/homebrew-tap
 |----------------|------|
 | `ffmpeg`       | フルビルドの FFmpeg。リンク時に Homebrew の公式 `ffmpeg` を置き換えます |
 | `ffmpeg-ursus` | 同じフルビルドを keg-only（バージョン付き）でインストール。公式 `ffmpeg` は置き換えません |
-| `arib2bdnxml`  | ARIB キャプションを BDN XML に変換するツール |
+| `arib2bdnxml`  | ARIB STD-B24 キャプションを BDN XML+PNG に変換するツール |
+| `tsreadex`     | MPEG-TS ストリームの選択・安定化ツール |
 
 ---
 

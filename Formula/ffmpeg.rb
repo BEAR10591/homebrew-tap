@@ -1,4 +1,4 @@
-class FfmpegUrsus < Formula
+class Ffmpeg < Formula
   desc "FFmpeg with full codec set (gyan.dev full equivalent) and FDK-AAC"
   homepage "https://ffmpeg.org/"
   url "https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz"
@@ -8,10 +8,9 @@ class FfmpegUrsus < Formula
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
-    formula "ffmpeg"
+    url "https://ffmpeg.org/releases/"
+    regex(/href=.*?ffmpeg[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
-
-  keg_only :versioned_formula
 
   depends_on "pkgconf" => :build
   depends_on "aom"
@@ -202,11 +201,9 @@ class FfmpegUrsus < Formula
 
   def caveats
     <<~EOS
-      ffmpeg-ursus is based on Homebrew's ffmpeg-full with gyan.dev full-style
-      libraries and FDK-AAC. See https://www.gyan.dev/ffmpeg/builds/
-
-      It is keg_only (versioned formula), so it does not override system/core ffmpeg.
-      Use: brew link ffmpeg-ursus  (or add #{opt_bin} to PATH) to use these binaries.
+      This formula provides ffmpeg (same build as ffmpeg-ursus: gyan.dev full
+      equivalent + FDK-AAC). See https://www.gyan.dev/ffmpeg/builds/
+      It is linked into your prefix and will override Homebrew core ffmpeg if present.
 
       This build includes the non-free FDK-AAC encoder (--enable-nonfree).
       FDK-AAC is non-free; take care when redistributing the built binary.
