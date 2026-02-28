@@ -1,8 +1,8 @@
 class Arib2bdnxml < Formula
   desc "Convert ARIB STD-B24 Caption to BDN XML+PNG"
   homepage "https://github.com/BEAR10591/arib2bdnxml"
-  url "https://github.com/BEAR10591/arib2bdnxml/archive/refs/tags/v0.2.0.tar.gz"
-  sha256 "2f6d334289b66d7a8fe114f971b4eb7b23d643926bc1225892ad41bed59e2b49"
+  url "https://github.com/BEAR10591/arib2bdnxml/archive/refs/tags/v0.2.2.tar.gz"
+  sha256 "31fd68686f1d3ba6b0dad19a58d3672abb96b035f73591a97775832c2e30dcb7"
   license "MIT"
   head "https://github.com/BEAR10591/arib2bdnxml.git", branch: "main"
 
