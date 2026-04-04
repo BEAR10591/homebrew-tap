@@ -13,6 +13,9 @@ class Assettool < Formula
   depends_on "dotnet"
 
   def install
+    mkdir_p buildpath/"tmp"
+    ENV["TMPDIR"] = (buildpath/"tmp").to_s
+
     system "dotnet", "publish", "AssetTool/AssetTool.csproj",
            "-c", "Release",
            "--no-self-contained",
