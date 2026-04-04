@@ -1,4 +1,4 @@
-class AssetTools < Formula
+class Assettool < Formula
   desc "Convert Unreal Engine .uasset to JSON and JSON to .uasset"
   homepage "https://github.com/PedroMartinsMenezes/AssetTools"
   license "MIT"
