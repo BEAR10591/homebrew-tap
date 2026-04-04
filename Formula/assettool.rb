@@ -21,7 +21,8 @@ class Assettool < Formula
            "--no-self-contained",
            "-o", libexec
     rm libexec/"AssetTool.pdb"
-    bin.install_symlink libexec/"AssetTool"
+    (bin/"AssetTool").write_env_script libexec/"AssetTool",
+                                       DOTNET_ROOT: Formula["dotnet"].opt_libexec.to_s
   end
 
   test do
