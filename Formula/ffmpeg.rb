@@ -1,10 +1,13 @@
-class Ffmpeg < Formula
+class FfmpegFull < Formula
   desc "FFmpeg with full codec set (gyan.dev full equivalent) and FDK-AAC"
   homepage "https://ffmpeg.org/"
-  url "https://ffmpeg.org/releases/ffmpeg-8.0.1.tar.xz"
-  sha256 "05ee0b03119b45c0bdb4df654b96802e909e0a752f72e4fe3794f487229e5a41"
-  # GPL-2.0-or-later; use of fdk-aac adds non-free code (see caveats)
-  license "GPL-2.0-or-later"
+  url "https://ffmpeg.org/releases/ffmpeg-8.1.1.tar.xz"
+  sha256 "b6863adde98898f42602017462871b5f6333e65aec803fdd7a6308639c52edf3"
+  # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
+  # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
+  # Passing `--enable-version3` changes the license to GPL v3+.
+  # use of fdk-aac adds non-free code (see caveats).
+  license "GPL-3.0-or-later"
   head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
@@ -92,19 +95,6 @@ class Ffmpeg < Formula
 
   fails_with :gcc => "5"
 
-  # Fix for QtWebEngine, do not remove
-  # https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=270209
-  patch do
-    url "https://gitlab.archlinux.org/archlinux/packaging/packages/ffmpeg/-/raw/5670ccd86d3b816f49ebc18cab878125eca2f81f/add-av_stream_get_first_dts-for-chromium.patch"
-    sha256 "57e26caced5a1382cb639235f9555fc50e45e7bf8333f7c9ae3d49b3241d3f77"
-  end
-
-  # Add svt-av1 4.x support
-  patch do
-    url "https://git.ffmpeg.org/gitweb/ffmpeg.git/patch/a5d4c398b411a00ac09d8fe3b66117222323844c"
-    sha256 "1dbbc1a4cf9834b3902236abc27fefe982da03a14bcaa89fb90c7c8bd10a1664"
-  end
-
   def install
     # The new linker leads to duplicate symbol issue https://github.com/homebrew-ffmpeg/homebrew-ffmpeg/issues/140
     ENV.append "LDFLAGS", "-Wl,-ld_classic" if DevelopmentTools.ld64_version.between?("1015.7", "1022.1")
@@ -188,7 +178,9 @@ class Ffmpeg < Formula
       ]
     end
 
-    ENV.prepend_path "PKG_CONFIG_PATH", Formula["whisper-cpp"].opt_lib/"pkgconfig"
+ # Needs corefoundation, coremedia, corevideo
+    args += %w[--enable-videotoolbox --enable-audiotoolbox --enable-opencl --enable-openal] if OS.mac?
+    args << "--enable-neon" if Hardware::CPU.arm?
 
     system "./configure", *args
     system "make", "install"
