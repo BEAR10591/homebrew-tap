@@ -1,4 +1,4 @@
-class FfmpegFull < Formula
+class Ffmpeg < Formula
   desc "FFmpeg with full codec set (gyan.dev full equivalent) and FDK-AAC"
   homepage "https://ffmpeg.org/"
   url "https://ffmpeg.org/releases/ffmpeg-8.1.1.tar.xz"
